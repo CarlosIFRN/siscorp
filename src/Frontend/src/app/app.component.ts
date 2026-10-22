@@ -15,7 +15,7 @@ export class AppComponent {
   readonly steps = [
     { id: 1, label: 'Seus dados', detail: 'Vamos nos conhecer', icon: 'user', path: '/formulario_cliente' },
     { id: 2, label: 'Veículo e serviço', detail: 'O cuidado ideal', icon: 'car', path: '/formulario_cliente-servico' },
-    { id: 3, label: 'Agenda da semana', detail: 'No seu melhor horário', icon: 'calendar', path: '/agenda-da-semana' },
+    { id: 3, label: 'Agenda', detail: 'No seu melhor horário', icon: 'calendar', path: '/agenda-da-semana' },
     { id: 4, label: 'Confirmação', detail: 'Tudo pronto para você', icon: 'checkCircle', path: '/confirmacao' }
   ];
   constructor() {
