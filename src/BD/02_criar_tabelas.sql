@@ -18,8 +18,15 @@ CREATE TABLE tipos_pagamento (
 
 CREATE TABLE servicos (
     id_servico SERIAL PRIMARY KEY,
+    id_empresa INTEGER NOT NULL,
     nome_servico VARCHAR(100) NOT NULL,
-    valor NUMERIC(10,2) NOT NULL
+    valor NUMERIC(10,2) NOT NULL,
+    duracao_minutos INTEGER NOT NULL DEFAULT 30,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_servico_empresa
+        FOREIGN KEY (id_empresa)
+        REFERENCES empresas(id_empresa)
 );
 
 CREATE TABLE clientes (
@@ -61,11 +68,17 @@ CREATE TABLE veiculos (
 CREATE TABLE agendamentos (
     id_agendamento SERIAL PRIMARY KEY,
     id_veiculo INTEGER NOT NULL,
+    id_servico INTEGER NOT NULL,
     data_hora TIMESTAMP NOT NULL,
     status VARCHAR(30) NOT NULL,
+
     CONSTRAINT fk_agendamento_veiculo
         FOREIGN KEY (id_veiculo)
-        REFERENCES veiculos(id_veiculo)
+        REFERENCES veiculos(id_veiculo),
+
+    CONSTRAINT fk_agendamento_servico
+        FOREIGN KEY (id_servico)
+        REFERENCES servicos(id_servico)
 );
 
 CREATE TABLE ordens_servico (
