@@ -1,33 +1,10 @@
-<section class="dashboard-heading">
-  <div><span class="section-kicker">VISÃO GERAL</span><h1 tabindex="-1">Seu cuidado, <span>no seu tempo.</span></h1><p>Organize seus agendamentos e acompanhe o próximo passo em um só lugar.</p><span class="dashboard-date"><app-icon name="calendar" /> {{ today }}</span></div>
-  <a routerLink="/formulario_cliente" class="button primary"><app-icon name="calendar" /> Novo agendamento <app-icon name="arrow" /></a>
-</section>
-
-<section class="dashboard-stats" aria-label="Resumo do agendamento">
-  <article class="stat-card"><span class="stat-icon"><app-icon name="calendar" /></span><span class="stat-value">{{ booking.history().length }}</span><span class="stat-name">Agendamentos nesta sessão</span><small>Confirmações feitas neste navegador</small></article>
-  <article class="stat-card"><span class="stat-icon"><app-icon name="clock" /></span><span class="stat-value">{{ availableThisWeek() }}</span><span class="stat-name">Horários disponíveis</span><small>Próximos sete dias · demonstração</small></article>
-  <article class="stat-card"><span class="stat-icon"><app-icon name="sparkles" /></span><span class="stat-value">{{ serviceCount }}</span><span class="stat-name">Opções de serviço</span><small>Escolha o cuidado ideal</small></article>
-</section>
-
-<div class="dashboard-grid">
-  <section class="panel dashboard-main-card" aria-labelledby="next-booking-title">
-    <div class="dashboard-card-header"><div><span class="section-kicker">NA SUA AGENDA</span><h2 id="next-booking-title">Próximo agendamento</h2></div><span class="dashboard-status"><span class="status-dot"></span> {{ next() ? 'Confirmado nesta sessão' : 'Aguardando você' }}</span></div>
-    @if (next(); as appointment) {
-      <div class="appointment-highlight"><span class="appointment-icon"><app-icon name="car" /></span><div><strong>{{ serviceName(appointment) }}</strong><span>{{ appointment.vehicle.description }}</span></div></div>
-      <div class="appointment-details"><div><app-icon name="calendar" /><span>Data e horário</span><strong>{{ formatSlot(appointment.slot) }}</strong></div><div><app-icon name="checkCircle" /><span>Comprovante</span><strong>{{ appointment.receipt.code }}</strong></div></div>
-      <p class="dashboard-hint">Este agendamento é demonstrativo e fica salvo somente nesta sessão do navegador.</p>
-    } @else {
-      <div class="dashboard-empty"><span class="empty-icon"><app-icon name="calendar" /></span><h3>Seu próximo cuidado começa aqui.</h3><p>Escolha o serviço e um horário para ver os detalhes do agendamento neste painel.</p><a routerLink="/formulario_cliente" class="button primary">Começar agendamento <app-icon name="arrow" /></a></div>
-    }
-  </section>
-
-  <aside class="dashboard-side">
-    <section class="panel dashboard-progress" aria-labelledby="progress-title"><span class="section-kicker">CONTINUE DE ONDE PAROU</span><h2 id="progress-title">Seu agendamento</h2><p>{{ draftStep() === 4 ? 'Agendamento confirmado nesta sessão.' : draftStep() ? 'Você já começou. Continue quando quiser.' : 'Quatro etapas simples para reservar seu horário.' }}</p><div class="progress-track"><span [style.width.%]="draftStep() * 25"></span></div><div class="progress-caption"><span>{{ draftStep() }} de 4 etapas</span><strong>{{ draftStep() * 25 }}%</strong></div><a [routerLink]="resumePath()" class="text-link">{{ draftStep() === 4 ? 'Ver comprovante' : draftStep() ? 'Continuar' : 'Começar agora' }} <app-icon name="arrow" /></a></section>
-    <section class="dashboard-tip"><app-icon name="shield" /><h2>Agende com tranquilidade.</h2><p>A forma de pagamento é informada na confirmação e o pagamento acontece na unidade.</p></section>
-  </aside>
+<div class="dashboard-page">
+  <div class="management-heading"><div><span class="admin-kicker">VISÃO GERAL DA OPERAÇÃO</span><h1 tabindex="-1">Dashboard</h1><p>Acompanhe os agendamentos e o andamento dos veículos em um só lugar.</p><span class="management-date"><app-icon name="calendar" /> {{ todayLabel }}</span></div><a routerLink="/agenda" class="admin-primary"><app-icon name="calendar" /> Abrir agenda</a></div>
+  @if (crm.error()) { <div class="admin-alert" role="alert">{{ crm.error() }} <button type="button" (click)="crm.refresh()">Tentar novamente</button></div> }
+  <div class="management-stats" aria-label="Indicadores da operação"><article><span class="stat-icon"><app-icon name="calendar" /></span><strong>{{ crm.today().length }}</strong><span>Agendamentos hoje</span><small>Reservas para esta data</small></article><article><span class="stat-icon blue"><app-icon name="clock" /></span><strong>{{ scheduled() }}</strong><span>Aguardando atendimento</span><small>Agendados na agenda</small></article><article><span class="stat-icon amber"><app-icon name="car" /></span><strong>{{ inProgress() }}</strong><span>Em lavagem</span><small>Veículos em atendimento</small></article><article><span class="stat-icon green"><app-icon name="checkCircle" /></span><strong>{{ ready() }}</strong><span>Prontos para entrega</span><small>Serviço concluído no pátio</small></article></div>
+  <div class="management-grid"><section class="management-card" aria-labelledby="upcoming-heading"><div class="management-card-header"><div><span class="admin-kicker">PRÓXIMOS ATENDIMENTOS</span><h2 id="upcoming-heading">Fila de agendamentos</h2></div><a routerLink="/agenda">Ver agenda completa <app-icon name="arrow" /></a></div>
+    @if (crm.loading()) { <p class="management-empty">Carregando agendamentos…</p> }
+    @else if (next().length) { <div class="management-table-wrap"><table class="management-table"><thead><tr><th>Cliente / veículo</th><th>Serviço</th><th>Data e hora</th><th>Status</th></tr></thead><tbody>@for (item of next(); track item.id) { <tr><td><strong>{{ item.customerName }}</strong><small>{{ item.vehicleModel }} · {{ item.licensePlate }}</small></td><td>{{ serviceName(item.service) }}</td><td>{{ formatSlot(item) }}</td><td><span class="status-pill" [class]="'status-pill ' + item.status.toLowerCase()">{{ statusName(item.status) }}</span></td></tr> }</tbody></table></div> }
+    @else { <div class="management-empty"><app-icon name="calendar" /><strong>Nenhum agendamento futuro</strong><p>As reservas feitas no formulário público aparecerão aqui.</p><a routerLink="/agendar">Abrir formulário público <app-icon name="arrow" /></a></div> }
+  </section><aside class="management-side"><section class="management-card quick-card"><span class="admin-kicker">ACESSO RÁPIDO</span><h2>Organize o dia</h2><p>Veja todos os horários e atualize o estado de cada atendimento na agenda.</p><a routerLink="/agenda"><app-icon name="calendar" /><span>Gerenciar agenda</span><app-icon name="chevron" /></a><a routerLink="/agendar"><app-icon name="link" /><span>Abrir formulário público</span><app-icon name="chevron" /></a></section><section class="management-card flow-card"><span class="admin-kicker">FLUXO DO PÁTIO</span><h2>Do agendamento à entrega</h2><ol><li>Agendado</li><li>Em lavagem</li><li>Pronto</li><li>Concluído</li></ol></section></aside></div>
 </div>
-
-<section class="panel dashboard-history" aria-labelledby="history-title"><div class="dashboard-card-header"><div><span class="section-kicker">HISTÓRICO</span><h2 id="history-title">Agendamentos recentes</h2></div></div>
-  @if (recent().length) { <ul>@for (appointment of recent(); track appointment.receipt.code) { <li><span class="history-icon"><app-icon name="car" /></span><span class="history-description"><strong>{{ serviceName(appointment) }}</strong><small>{{ appointment.vehicle.description }}</small></span><span class="history-date">{{ formatSlot(appointment.slot) }}</span><span class="history-code">{{ appointment.receipt.code }}</span></li> }</ul> }
-  @else { <p class="history-empty">Ainda não há agendamentos confirmados nesta sessão. <a routerLink="/formulario_cliente">Criar o primeiro</a></p> }
-</section>

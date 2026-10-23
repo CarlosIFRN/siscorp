@@ -1,32 +1,15 @@
 <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
-<aside class="sidebar" [class.is-open]="mobileOpen()" id="main-navigation">
-  <a class="brand" routerLink="/dashboard" aria-label="CWOS, início"><span class="brand-symbol"><app-icon name="drop" /></span><span>CWOS<span class="brand-caption">cuidado em cada detalhe</span></span></a>
-  <div class="workspace-label"><span class="status-dot"></span> Portal de agendamentos</div>
-  <nav aria-label="Navegação principal">
-    <p class="nav-label">VISÃO GERAL</p>
-    <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-item"><app-icon name="dashboard" /><span>Dashboard</span><app-icon class="nav-chevron" name="chevron" /></a>
-    <p class="nav-label nav-label-spaced">AGENDAMENTO</p>
-    @for (item of steps; track item.id) {
-      <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-item">
-        <app-icon [name]="item.icon" /><span>{{ item.label }}</span><app-icon class="nav-chevron" name="chevron" />
-      </a>
-    }
-  </nav>
-  <div class="sidebar-bottom"><div class="sidebar-note"><app-icon name="sparkles" /><h3>Seu veículo merece<br>esse cuidado.</h3><p>Mais brilho no veículo.<br>Mais tempo para você.</p><span class="note-line"></span></div><div class="sidebar-signature"><span class="mini-brand">C</span><span>Chrono Washing<small>Simples. No seu tempo.</small></span></div></div>
-</aside>
-@if (mobileOpen()) { <button type="button" class="sidebar-backdrop" (click)="closeMenu()" aria-label="Fechar navegação"></button> }
-<div class="app-body">
-  <header class="topbar"><div class="breadcrumb"><button type="button" id="menu-toggle" class="icon-button menu-toggle" (click)="mobileOpen.set(!mobileOpen())" [attr.aria-expanded]="mobileOpen()" aria-controls="main-navigation" [attr.aria-label]="mobileOpen() ? 'Fechar menu' : 'Abrir menu'"><app-icon [name]="mobileOpen() ? 'close' : 'menu'" /></button><span class="breadcrumb-parent">{{ step() ? 'Agendamento' : 'Início' }}</span><app-icon class="breadcrumb-arrow" name="chevron" /><span>{{ page() }}</span></div><div class="topbar-right"><span class="online-label"><span class="status-dot"></span> Agendamento online</span><span class="avatar" aria-label="Área do cliente"><app-icon name="user" /></span></div></header>
-  <main id="main-content" [attr.inert]="mobileOpen() ? '' : null">
-    @if (step()) {
-    <div class="page-topline"><span class="eyebrow">SEU CARRO BEM CUIDADO. SEU TEMPO TAMBÉM.</span><span class="step-counter">ETAPA <b>0{{ step() }}</b> / 04</span></div>
-    <ol class="stepper" aria-label="Etapas do agendamento">
-      @for (item of steps; track item.id) {
-        <li [class.current]="step() === item.id" [class.completed]="done(item.id)"><a [routerLink]="item.path" [attr.aria-current]="step() === item.id ? 'step' : null"><span class="step-number">@if (done(item.id) && step() !== item.id) { <app-icon name="check" /> } @else { {{ item.id }} }</span><span class="step-copy"><strong>{{ item.label }}</strong><small>{{ item.detail }}</small></span></a></li>
-      }
-    </ol>
-    }
-    <router-outlet />
-    <footer class="page-footer"><span>© {{ 2026 }} CWOS · Chrono Washing</span><span><app-icon name="shield" /> Cuidado do começo ao fim</span></footer>
-  </main>
-</div>
+@if (layout() === 'admin') {
+  <div class="admin-shell" [class.sidebar-collapsed]="collapsed()">
+    <aside class="admin-sidebar" [class.is-open]="mobileOpen()" id="admin-navigation">
+      <a routerLink="/dashboard" class="admin-brand" aria-label="CWOS, dashboard"><span class="admin-brand-mark"><app-icon name="drop" /></span><span class="admin-brand-copy"><strong>CWOS</strong><small>GESTÃO DO LAVA-JATO</small></span></a>
+      <div class="admin-workspace"><span class="online-dot"></span><span>Painel de gestão</span></div>
+      <nav aria-label="Navegação principal"><span class="admin-nav-title">OPERAÇÃO</span><a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page" class="admin-nav-link" aria-label="Dashboard"><app-icon name="dashboard" /><span>Dashboard</span></a><a routerLink="/agenda" routerLinkActive="active" ariaCurrentWhenActive="page" class="admin-nav-link" aria-label="Agenda"><app-icon name="calendar" /><span>Agenda</span></a></nav>
+      <div class="admin-sidebar-bottom"><a routerLink="/agendar" class="admin-nav-link" aria-label="Formulário público"><app-icon name="link" /><span>Formulário público</span></a></div>
+    </aside>
+    @if (mobileOpen()) { <button type="button" class="admin-backdrop" (click)="mobileOpen.set(false)" aria-label="Fechar menu"></button> }
+    <div class="admin-body"><header class="admin-topbar"><div><button type="button" class="sidebar-toggle" (click)="toggleSidebar()" [attr.aria-expanded]="!collapsed()" aria-controls="admin-navigation" [attr.aria-label]="mobileOpen() ? 'Fechar menu' : collapsed() ? 'Expandir sidebar' : 'Recolher sidebar'"><app-icon name="menu" /></button><span class="admin-breadcrumb">CWOS <app-icon name="chevron" /> {{ page() }}</span></div><div class="admin-topbar-right"><span class="online-dot"></span><span>Demonstração local</span><span class="admin-avatar">G</span></div></header><main id="main-content" [attr.inert]="mobileOpen() ? '' : null"><router-outlet /></main></div>
+  </div>
+} @else {
+  <div id="main-content"><router-outlet /></div>
+}
