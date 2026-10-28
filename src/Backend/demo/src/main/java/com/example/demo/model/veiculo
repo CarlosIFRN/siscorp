@@ -1,9 +1,14 @@
-id
-cliente id
-placa
-marca
-modelo
-ano
-cor
-tipo de veiculo
-observações
+CREATE TABLE veiculos (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    marca VARCHAR(60) NOT NULL,
+    modelo VARCHAR(80) NOT NULL,
+    ano INTEGER NOT NULL,
+    cor VARCHAR(30),
+    placa VARCHAR(10) UNIQUE NOT NULL,
+    renavam VARCHAR(20) UNIQUE,
+    chassi VARCHAR(30) UNIQUE,
+    combustivel VARCHAR(20),
+    quilometragem NUMERIC(12, 2) DEFAULT 0,
+    valor NUMERIC(12, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'Disponível'
+);
