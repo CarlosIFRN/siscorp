@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -15,17 +16,17 @@ public class Servico {
     @Column(name = "id_empresa", nullable = false)
     private Integer idEmpresa;
 
-    @Column(name = "nome_servico", nullable = false)
+    @Column(name = "nome_servico", nullable = false, length = 100)
     private String nomeServico;
 
-    @Column(name = "valor", nullable = false)
+    @Column(name = "valor", nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
 
     @Column(name = "duracao_minutos", nullable = false)
-    private Integer duracaoMinutos;
+    private Integer duracaoMinutos = 80;
 
     @Column(name = "ativo", nullable = false)
-    private Boolean ativo;
+    private Boolean ativo = true;
 
     public Servico() {
     }
