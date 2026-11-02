@@ -1,58 +1,14 @@
 # Banco de Dados — CWOS
 
-O banco de dados do projeto CWOS (Chrono Washing Operational System) utiliza PostgreSQL.
+O banco de dados atual utiliza PostgreSQL. Os scripts são executados manualmente, nesta ordem:
 
-## Estrutura
+1. `01_criar_banco.sql`: cria o banco `cwos`.
+2. `02_criar_tabelas.sql`: cria as tabelas operacionais.
+3. `03_criar_usuarios.sql`: cria a tabela de usuários para o CRUD.
 
-Os scripts SQL estão organizados na seguinte ordem:
+Em uma instalação que já executou os dois primeiros scripts, execute apenas `03_criar_usuarios.sql`.
+A API está configurada com `spring.jpa.hibernate.ddl-auto=none`, portanto não cria a tabela automaticamente.
 
-- `01_criar_banco.sql` — criação do banco de dados `cwos`;
-- `02_criar_tabelas.sql` — criação das tabelas e seus relacionamentos.
-
-## Ordem de execução
-
-### 1. Criar o banco
-
-Executar o arquivo:
-
-`01_criar_banco.sql`
-
-Após a criação, conectar-se ao banco `cwos`.
-
-### 2. Criar as tabelas
-
-Com o banco `cwos` selecionado, executar o arquivo:
-
-`02_criar_tabelas.sql`
-
-## Tabelas atuais
-
-O modelo atual possui as seguintes tabelas:
-
-- `empresas`
-- `cargos`
-- `tipos_pagamento`
-- `servicos`
-- `clientes`
-- `funcionarios`
-- `veiculos`
-- `agendamentos`
-- `ordens_servico`
-- `ordem_servico_servicos`
-- `pagamentos`
-
-## Principais relacionamentos
-
-- Uma empresa pode possuir vários clientes.
-- Uma empresa pode possuir vários funcionários.
-- Um funcionário pertence a um cargo.
-- Um cliente pode possuir veículos.
-- Um veículo pode possuir agendamentos.
-- Um veículo pode possuir ordens de serviço.
-- Uma ordem de serviço pode possuir vários serviços.
-- Uma ordem de serviço pode possuir pagamentos.
-- Cada pagamento possui um tipo de pagamento.
-
-## Observação
-
-O modelo está em desenvolvimento e poderá ser ajustado conforme a definição das funcionalidades da primeira versão do sistema.
+O modelo operacional antigo ainda possui `clientes`, `funcionarios` e `cargos`.
+O novo `Usuario` reúne identidade, senha e perfil (`ADMIN`, `FUNCIONARIO` ou `CLIENTE`).
+A ligação dos registros operacionais antigos com `usuarios` será feita em uma etapa posterior.
