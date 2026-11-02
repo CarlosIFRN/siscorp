@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
 
                         // O catálogo de serviços ativos é público
                         .requestMatchers(
