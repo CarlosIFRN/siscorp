@@ -7,9 +7,7 @@ public class Usuario {
     private String nomeUsuario;
     private String emailUsuario;
     private String senhaHash;
-    private Cargo cargo;
     private String telefone;
-    private String endereco;
     private boolean ativo = true;
 
     public Usuario() {}
@@ -23,12 +21,8 @@ public class Usuario {
     @JsonIgnore
     public String getSenhaHash() { return senhaHash; }
     public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
-    public Cargo getCargo() { return cargo; }
-    public void setCargo(Cargo cargo) { this.cargo = cargo; }
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
-    public String getEndereco() { return endereco; }
-    public void setEndereco(String endereco) { this.endereco = endereco; }
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
 }

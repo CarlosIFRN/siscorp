@@ -20,17 +20,14 @@ public class ServicoService {
         this.repository = repository;
     }
 
-    // Lista somente os serviços ativos de uma empresa
     public List<Servico> listarAtivos(Integer idEmpresa) {
         return repository.findByIdEmpresaAndAtivoTrue(idEmpresa);
     }
 
-    // Lista todos os serviços de uma empresa
     public List<Servico> listarTodos(Integer idEmpresa) {
         return repository.findByIdEmpresa(idEmpresa);
     }
 
-    // Cadastra um novo serviço
     @Transactional
     public Servico cadastrar(Servico servico) {
 
@@ -42,7 +39,6 @@ public class ServicoService {
         return repository.save(servico);
     }
 
-    // Atualiza um serviço existente
     @Transactional
     public Servico atualizar(Integer id, Servico dados) {
 
@@ -60,7 +56,6 @@ public class ServicoService {
         return repository.save(servico);
     }
 
-    // Desativa um serviço sem apagar do banco
     @Transactional
     public void desativar(Integer id) {
 
@@ -74,7 +69,6 @@ public class ServicoService {
         repository.save(servico);
     }
 
-    // Valida os dados recebidos
     private void validar(Servico servico) {
 
         if (servico.getNomeServico() == null

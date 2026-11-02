@@ -21,7 +21,6 @@ public class ServicoController {
         this.service = service;
     }
 
-    // Lista somente serviços ativos
     @GetMapping("/ativos/{idEmpresa}")
     public ResponseEntity<List<Servico>> listarAtivos(
             @PathVariable Integer idEmpresa) {
@@ -30,7 +29,6 @@ public class ServicoController {
                 service.listarAtivos(idEmpresa));
     }
 
-    // Lista todos os serviços de uma empresa
     @GetMapping("/empresa/{idEmpresa}")
     public ResponseEntity<List<Servico>> listarTodos(
             @PathVariable Integer idEmpresa) {
@@ -39,7 +37,6 @@ public class ServicoController {
                 service.listarTodos(idEmpresa));
     }
 
-    // Cadastra um serviço
     @PostMapping
     public ResponseEntity<Servico> cadastrar(
             @RequestBody Servico servico) {
@@ -51,7 +48,6 @@ public class ServicoController {
                 .body(criado);
     }
 
-    // Atualiza um serviço
     @PutMapping("/{id}")
     public ResponseEntity<Servico> atualizar(
             @PathVariable Integer id,
@@ -61,7 +57,6 @@ public class ServicoController {
                 service.atualizar(id, servico));
     }
 
-    // Desativa um serviço
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> desativar(
             @PathVariable Integer id) {
