@@ -1,7 +1,5 @@
 package com.example.demo.service;
 
-import org.springframework.context.annotation.Profile;
-
 import com.example.demo.dto.AtualizarUsuarioRequest;
 import com.example.demo.dto.CriarUsuarioRequest;
 import com.example.demo.dto.UsuarioResponse;
@@ -9,6 +7,7 @@ import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,9 +39,7 @@ public class UsuarioService {
         usuario.setNomeUsuario(request.nome().trim());
         usuario.setEmailUsuario(email);
         usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
-        usuario.setCargo(request.cargo());
         usuario.setTelefone(request.telefone());
-        usuario.setEndereco(request.endereco());
         return UsuarioResponse.de(repository.save(usuario));
     }
 
@@ -52,9 +49,7 @@ public class UsuarioService {
         validarEmailUnico(email, id);
         usuario.setNomeUsuario(request.nome().trim());
         usuario.setEmailUsuario(email);
-        usuario.setCargo(request.cargo());
         usuario.setTelefone(request.telefone());
-        usuario.setEndereco(request.endereco());
         if (request.senha() != null) {
             usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         }

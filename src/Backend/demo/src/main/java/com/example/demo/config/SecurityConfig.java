@@ -15,7 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    // Define os usuários de teste e seus cargos
     @Bean
     public InMemoryUserDetailsManager usuarios() {
 
@@ -39,13 +38,11 @@ public class SecurityConfig {
         );
     }
 
-    // Define como as senhas serão criptografadas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Define as regras de acesso às rotas
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
@@ -56,41 +53,34 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
 
-                        // O catálogo de serviços ativos é público
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/servicos/ativos/**"
                         ).permitAll()
 
-                        // Consultar todos os serviços exige ADMIN
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/servicos/empresa/**"
                         ).hasRole("ADMIN")
 
-                        // Cadastrar serviços exige ADMIN
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/servicos"
                         ).hasRole("ADMIN")
 
-                        // Alterar serviços exige ADMIN
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/servicos/**"
                         ).hasRole("ADMIN")
 
-                        // Desativar serviços exige ADMIN
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/servicos/**"
                         ).hasRole("ADMIN")
 
-                        // Qualquer outra rota exige autenticação
                         .anyRequest().authenticated()
                 )
 
-                // Ativa autenticação HTTP Basic
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

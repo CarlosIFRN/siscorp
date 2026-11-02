@@ -1,32 +1,28 @@
-# CRUD de Usuario em memoria
+# CRUD de Usuario em memória
 
-O perfil padrão do backend é `memory`. Nele, `UsuarioRepository` guarda usuários em memória; os registros desaparecem ao reiniciar a aplicação. Não é necessário configurar PostgreSQL para testar esse CRUD.
+O perfil padrão do backend é `memory`. O `UsuarioRepository` guarda os usuários em memória, portanto os dados desaparecem quando a aplicação é reiniciada.
 
-## Endpoints
+## Rotas
 
-Todas as rotas abaixo exigem `ADMIN` pela configuração de segurança atual:
-
-| Método | Rota | Efeito |
+| Método | Rota | Ação |
 | --- | --- | --- |
-| GET | `/api/usuarios` | Lista usuários |
-| GET | `/api/usuarios/{id}` | Busca um usuário |
-| POST | `/api/usuarios` | Cria um usuário |
-| PUT | `/api/usuarios/{id}` | Atualiza dados e, se enviada, a senha |
-| DELETE | `/api/usuarios/{id}` | Desativa sem apagar |
+| GET | `/api/usuarios` | Listar |
+| GET | `/api/usuarios/{id}` | Buscar |
+| POST | `/api/usuarios` | Criar |
+| PUT | `/api/usuarios/{id}` | Atualizar |
+| DELETE | `/api/usuarios/{id}` | Desativar |
 
-Exemplo de POST:
+Exemplo de cadastro:
 
 ```json
 {
   "nome": "Ana Silva",
   "email": "ana@example.com",
   "senha": "senhaForte123",
-  "cargo": "CLIENTE",
-  "telefone": "84999990000",
-  "endereco": "Rua A"
+  "telefone": "84999990000"
 }
 ```
 
-As respostas usam `UsuarioResponse` e nunca contêm a senha. O e-mail é normalizado para minúsculas e não pode ser duplicado. As senhas são armazenadas com o `PasswordEncoder` já configurado no projeto (bcrypt).
+O model `Usuario` contém somente identificador, nome, e-mail, hash da senha, telefone e indicador de atividade. A API não devolve a senha. O e-mail é único e convertido para minúsculas.
 
-O perfil `db` preserva a configuração PostgreSQL anterior para o módulo de serviços. Este CRUD em memória é ativado apenas no perfil `memory`. O login ainda utiliza os usuários de demonstração configurados em `SecurityConfig`; integrar o login com os `Usuario` cadastrados é uma etapa separada.
+As rotas continuam restritas ao usuário de demonstração `ADMIN` definido em `SecurityConfig`. Esse papel de acesso não é um campo do model `Usuario`. O login dos usuários cadastrados ainda não foi implementado.
