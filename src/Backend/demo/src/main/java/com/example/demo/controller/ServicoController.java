@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import org.springframework.context.annotation.Profile;
+
 import com.example.demo.model.Servico;
 import com.example.demo.service.ServicoService;
 import org.springframework.http.HttpStatus;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Profile("db")
 @RestController
 @RequestMapping("/api/servicos")
 public class ServicoController {
