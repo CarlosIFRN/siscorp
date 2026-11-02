@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import org.springframework.context.annotation.Profile;
+
 import com.example.demo.model.Servico;
 import com.example.demo.repository.ServicoRepository;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Profile("db")
 @Service
 public class ServicoService {
 
