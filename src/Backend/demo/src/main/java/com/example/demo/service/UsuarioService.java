@@ -1,8 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.AtualizarUsuarioRequest;
-import com.example.demo.dto.CriarUsuarioRequest;
-import com.example.demo.dto.UsuarioResponse;
+import com.example.demo.dto.UsuarioRequestDTO;
+import com.example.demo.dto.UsuarioResponseDTO;
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
 import java.util.List;
@@ -24,15 +23,15 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UsuarioResponse> listar() {
-        return repository.findAll().stream().map(UsuarioResponse::de).toList();
+    public List<UsuarioResponseDTO> listar() {
+        return repository.findAll().stream().map(UsuarioResponseDTO::de).toList();
     }
 
-    public UsuarioResponse buscar(Integer id) {
-        return UsuarioResponse.de(encontrar(id));
+    public UsuarioResponseDTO buscar(Integer id) {
+        return UsuarioResponseDTO.de(encontrar(id));
     }
 
-    public synchronized UsuarioResponse criar(CriarUsuarioRequest request) {
+    public synchronized UsuarioResponseDTO criar(UsuarioRequestDTO request) {
         String email = normalizarEmail(request.email());
         validarEmailUnico(email, null);
         Usuario usuario = new Usuario();
@@ -40,10 +39,10 @@ public class UsuarioService {
         usuario.setEmailUsuario(email);
         usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         usuario.setTelefone(request.telefone());
-        return UsuarioResponse.de(repository.save(usuario));
+        return UsuarioResponseDTO.de(repository.save(usuario));
     }
 
-    public synchronized UsuarioResponse atualizar(Integer id, AtualizarUsuarioRequest request) {
+    public synchronized UsuarioResponseDTO atualizar(Integer id, UsuarioRequestDTO request) {
         Usuario usuario = encontrar(id);
         String email = normalizarEmail(request.email());
         validarEmailUnico(email, id);
@@ -53,7 +52,7 @@ public class UsuarioService {
         if (request.senha() != null) {
             usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         }
-        return UsuarioResponse.de(repository.save(usuario));
+        return UsuarioResponseDTO.de(repository.save(usuario));
     }
 
     public synchronized void desativar(Integer id) {

@@ -2,14 +2,14 @@ package com.example.demo.controller;
 
 import org.springframework.context.annotation.Profile;
 
-import com.example.demo.dto.AtualizarUsuarioRequest;
-import com.example.demo.dto.CriarUsuarioRequest;
-import com.example.demo.dto.UsuarioResponse;
+import com.example.demo.dto.UsuarioRequestDTO;
+import com.example.demo.dto.UsuarioResponseDTO;
 import com.example.demo.service.UsuarioService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Profile("memory")
@@ -23,23 +23,24 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public List<UsuarioResponse> listar() {
+    public List<UsuarioResponseDTO> listar() {
         return service.listar();
     }
 
     @GetMapping("/{id}")
-    public UsuarioResponse buscar(@PathVariable Integer id) {
+    public UsuarioResponseDTO buscar(@PathVariable Integer id) {
         return service.buscar(id);
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioResponse> criar(@Valid @RequestBody CriarUsuarioRequest request) {
-        UsuarioResponse criado = service.criar(request);
+    public ResponseEntity<UsuarioResponseDTO> criar(
+            @Validated(UsuarioRequestDTO.Criacao.class) @RequestBody UsuarioRequestDTO request) {
+        UsuarioResponseDTO criado = service.criar(request);
         return ResponseEntity.created(URI.create("/api/usuarios/" + criado.id())).body(criado);
     }
 
     @PutMapping("/{id}")
-    public UsuarioResponse atualizar(@PathVariable Integer id, @Valid @RequestBody AtualizarUsuarioRequest request) {
+    public UsuarioResponseDTO atualizar(@PathVariable Integer id, @Valid @RequestBody UsuarioRequestDTO request) {
         return service.atualizar(id, request);
     }
 

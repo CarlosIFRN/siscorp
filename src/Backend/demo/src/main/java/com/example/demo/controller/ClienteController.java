@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Cliente;
+import com.example.demo.dto.ClienteRequestDTO;
+import com.example.demo.dto.ClienteResponseDTO;
 import com.example.demo.service.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,28 +21,32 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarTodos() {
-        return ResponseEntity.ok(clienteService.listarTodos());
+    public ResponseEntity<List<ClienteResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(clienteService.listarTodos().stream()
+                .map(ClienteResponseDTO::de)
+                .toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(clienteService.buscarPorId(id));
+    public ResponseEntity<ClienteResponseDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(ClienteResponseDTO.de(clienteService.buscarPorId(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente) {
-        Cliente novoCliente = clienteService.cadastrar(cliente);
+    public ResponseEntity<ClienteResponseDTO> cadastrar(@Valid @RequestBody ClienteRequestDTO request) {
+        ClienteResponseDTO novoCliente = ClienteResponseDTO.de(
+                clienteService.cadastrar(request.toEntity()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(novoCliente);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(
+    public ResponseEntity<ClienteResponseDTO> atualizar(
             @PathVariable Integer id,
-            @RequestBody Cliente cliente
+            @Valid @RequestBody ClienteRequestDTO request
     ) {
-        return ResponseEntity.ok(clienteService.atualizar(id, cliente));
+        return ResponseEntity.ok(
+                ClienteResponseDTO.de(clienteService.atualizar(id, request.toEntity())));
     }
 
     @DeleteMapping("/{id}")
