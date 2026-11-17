@@ -4,7 +4,63 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bbf80554-1e02-4e1c-b877-d795be299eaf" name="Changes" comment="" />
+    <list default="true" id="bbf80554-1e02-4e1c-b877-d795be299eaf" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/model/TipoUsuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/BD/01_criar_banco.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/BD/02_criar_tabelas.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/BD/Banco_de_dados.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/BD/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/HELP.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/DemoApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/controller/ServicoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/controller/UsuarioController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/model/Servico.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/model/Usuario.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/repository/ServicoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/repository/UsuarioReposiotry.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/service/ServicoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/java/com/example/demo/service/UsuarioService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Backend/demo/src/test/java/com/example/demo/DemoApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/README.frontend.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/angular.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/public/favicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/app.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/app.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/app.routes.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/core/booking.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/core/booking.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/confirmation.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/confirmation.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/customer.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/customer.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/dashboard.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/dashboard.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/schedule.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/schedule.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/vehicle.component.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/pages/vehicle.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/app/shared/icon.component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/main.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/src/styles.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/tsconfig.app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/siscorp-main/src/Frontend/tsconfig.spec.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/demo/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/model/Usuario.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -20,6 +76,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Diogo02acai"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/CarlosIFRN/siscorp.git",
+    "accountId": "7161e807-a4d8-4065-855c-31908eff01ff"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0,
   &quot;fromUser&quot;: false
@@ -37,10 +105,11 @@
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.DemoApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "Rebasing feature/diogo",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/jose/OneDrive/Desktop/siscorp-main",
