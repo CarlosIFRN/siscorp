@@ -19,6 +19,19 @@ describe('CrmService', () => {
 
   afterEach(() => localStorage.removeItem(storageKey));
 
+  it('starts with an empty agenda and removes old example bookings without losing user bookings', async () => {
+    expect(service.appointments()).toEqual([]);
+    const userBooking = await service.create(input);
+    localStorage.setItem(storageKey, JSON.stringify([
+      { ...userBooking, id: 1, customerName: 'Cliente exemplo · Ana', email: 'exemplo@cwos.local' },
+      userBooking
+    ]));
+
+    const reopened = new CrmService();
+    expect(reopened.appointments()).toEqual([userBooking]);
+    expect(JSON.parse(localStorage.getItem(storageKey) || '[]')).toEqual([userBooking]);
+  });
+
   it('shows a public booking in the management agenda and blocks a duplicate slot', async () => {
     const created = await service.create(input);
     expect(service.appointments().some(item => item.id === created.id)).toBeTrue();

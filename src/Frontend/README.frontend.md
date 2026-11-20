@@ -22,7 +22,7 @@ Abra `http://localhost:4200`.
 
 ## Escopo desta entrega
 
-Esta entrega modifica apenas o frontend. Os dados são exemplos e ficam no `localStorage` deste navegador para permitir testar o fluxo entre as três páginas. As reservas não são compartilhadas com outros dispositivos e não são reais. A API, autenticação e persistência em PostgreSQL ficam para a etapa de backend; o diretório `src/Backend` não faz parte desta alteração.
+Esta entrega modifica apenas o frontend. A agenda começa vazia, sem agendamentos de exemplo. Reservas criadas pelo usuário ficam no `localStorage` deste navegador e não são compartilhadas com outros dispositivos. A API, autenticação e persistência em PostgreSQL ficam para a etapa de backend; o diretório `src/Backend` não faz parte desta alteração.
 
 ```powershell
 npm run build
