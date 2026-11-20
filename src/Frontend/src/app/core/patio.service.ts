@@ -131,6 +131,15 @@ export class PatioService {
     return updated;
   }
 
+  markPaid(id: number): ServiceOrder {
+    const orders = this.current();
+    const order = this.requireOrder(orders, id);
+    if (order.paymentStatus === 'PAGO') throw new Error('Esta OS já foi paga.');
+    const updated: ServiceOrder = { ...order, paymentStatus: 'PAGO' };
+    this.save(orders.map(item => item.id === id ? updated : item));
+    return updated;
+  }
+
   private create(orders: ServiceOrder[], input: WalkInInput & { appointmentId: number | null }): ServiceOrder {
     const plate = this.requireText(input.plate, 'Informe a placa.').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
     if (!/^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(plate)) throw new Error('Informe uma placa válida.');
@@ -162,6 +171,7 @@ export class PatioService {
   private requireOpenOrder(orders: ServiceOrder[], id: number): ServiceOrder {
     const order = this.requireOrder(orders, id);
     if (order.stage === 'ENTREGUE') throw new Error('Não é possível alterar serviços de uma OS entregue.');
+    if (order.paymentStatus === 'PAGO') throw new Error('Não é possível alterar serviços de uma OS já paga.');
     return order;
   }
 
