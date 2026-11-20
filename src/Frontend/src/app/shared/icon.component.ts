@@ -9,6 +9,7 @@ export class IconComponent {
   @Input() name = 'sparkles';
   readonly paths: Record<string, string> = {
     dashboard: 'M3 3h8v8H3V3Zm10 0h8v5h-8V3Zm0 7h8v11h-8V10ZM3 13h8v8H3v-8Z',
+    clipboard: 'M9 4h6m-7 0H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M8 2h8v4H8V2Zm0 9h8m-8 4h8',
     drop: 'M12 3C10 7 5 11 5 15a7 7 0 0 0 14 0c0-4-5-8-7-12ZM8.5 15a3.5 3.5 0 0 0 3.5 3.5',
     user: 'M20 21v-2a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v2M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
     car: 'M5 7l1-3h12l1 3 2 4v8h-3v-3H6v3H3v-8l2-4ZM4 10h16M7 13h1m8 0h1',
