@@ -1,0 +1,15 @@
+<main class="api-login-page">
+  <div class="api-login-card">
+    <span class="admin-kicker">CWOS · ACESSO À API</span>
+    <h1 tabindex="-1">Entrar</h1>
+    <p>Use a conta cadastrada no Spring Boot para consultar dados do servidor.</p>
+    <form (ngSubmit)="submit()">
+      <label>E-mail<input type="email" name="email" [(ngModel)]="email" autocomplete="username" required></label>
+      <label>Senha<input type="password" name="password" [(ngModel)]="password" autocomplete="current-password" required></label>
+      @if (error()) { <p class="api-form-error" role="alert">{{ error() }}</p> }
+      <button type="submit" class="admin-primary" [disabled]="busy()">{{ busy() ? 'Conectando…' : 'Entrar' }}</button>
+    </form>
+    <p class="api-login-note">As credenciais ficam somente na memória desta aba e são descartadas ao sair ou recarregar a página. O acesso continua sujeito às permissões do backend.</p>
+    <a routerLink="/agendar">Ir para o formulário público</a>
+  </div>
+</main>
