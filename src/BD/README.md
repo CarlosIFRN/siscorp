@@ -8,6 +8,7 @@ Os scripts SQL estão organizados na seguinte ordem:
 
 - `01_criar_banco.sql` — criação do banco de dados `cwos`;
 - `02_criar_tabelas.sql` — criação das tabelas e seus relacionamentos.
+- `03_criar_usuarios.sql` — criação da tabela de usuários para o CRUD.
 
 ## Ordem de execução
 
@@ -25,6 +26,10 @@ Com o banco `cwos` selecionado, executar o arquivo:
 
 `02_criar_tabelas.sql`
 
+### 3. Criar a tabela de usuários
+
+Com o banco `cwos` selecionado, executar `03_criar_usuarios.sql`. O script também pode ser executado em um banco já criado com os dois primeiros scripts.
+
 ## Tabelas atuais
 
 O modelo atual possui as seguintes tabelas:
@@ -40,6 +45,7 @@ O modelo atual possui as seguintes tabelas:
 - `ordens_servico`
 - `ordem_servico_servicos`
 - `pagamentos`
+- `usuarios`
 
 ## Principais relacionamentos
 

@@ -4,12 +4,14 @@ import com.example.demo.dto.ClienteRequestDTO;
 import com.example.demo.dto.ClienteResponseDTO;
 import com.example.demo.service.ClienteService;
 import jakarta.validation.Valid;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Profile("db")
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {

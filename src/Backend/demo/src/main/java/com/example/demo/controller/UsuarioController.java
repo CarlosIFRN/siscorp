@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import org.springframework.context.annotation.Profile;
 
 import com.example.demo.dto.UsuarioRequestDTO;
 import com.example.demo.dto.UsuarioResponseDTO;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Profile("memory")
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
