@@ -1,7 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ApiUser, UserRole } from './auth.service';
+export type UserRole = 'Admin' | 'Funcionario' | 'Cliente';
+export interface ApiUser {
+  id: number;
+  nome: string;
+  email: string;
+  telefone: string;
+  ativo: boolean;
+  tipoUsuario: UserRole;
+}
 
 export interface UserInput {
   nome: string;

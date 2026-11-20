@@ -21,14 +21,13 @@ Abra `http://localhost:4200`.
 | `/agenda` | Calendário mensal, semanal e diário, com busca, filtro e alteração de status. |
 | `/patio` | Quadro de OS por etapa, check-in de agendamento, atendimento avulso e ficha detalhada. |
 | `/financeiro` | Caixa diário com OS a receber, movimentações, despesas e fechamento. |
-| `/entrar` | Validação da conta pelo Spring Boot (`GET /api/auth/me`). |
-| `/usuarios` | CRUD real de usuários, disponível para contas Admin. |
+| `/usuarios` | Interface HTTP para o CRUD de usuários; o acesso à API exige autenticação Admin. |
 
 ## Escopo desta entrega
 
-O Angular usa `HttpClient` e o proxy `src/proxy.conf.json` para enviar `/api/**` ao Spring Boot em `127.0.0.1:8080` durante `npm start`. Inicie o backend separadamente. O login valida e-mail e senha em `/api/auth/me`; as credenciais HTTP Basic ficam apenas na memória da aba e são descartadas ao sair ou recarregar. A API valida as permissões; ocultar o link de Usuários na sidebar é apenas conveniência visual.
+O Angular usa `HttpClient` e o proxy `src/proxy.conf.json` para enviar `/api/**` ao Spring Boot em `127.0.0.1:8080` durante `npm start`. Inicie o backend separadamente. O frontend não tem tela de login, interceptor de autenticação nem armazena credenciais. `HttpClient` não exige login, mas os endpoints de usuários e agendamentos exigem HTTP Basic no Spring Security; sem credenciais, a API responde `401`.
 
-O CRUD de Usuários consome os endpoints `/api/usuarios`. A seção **Agendamentos do servidor**, no topo da Agenda, lista, cria, altera status e exclui registros em `/api/agendamentos`. A criação pede IDs de veículo e serviço já existentes porque a API de agendamentos não devolve seus detalhes e ainda não há endpoint de veículos para preencher o formulário automaticamente. Os endpoints de clientes e serviços existem apenas no perfil `db` e não são usados nesta interface.
+O CRUD de Usuários está preparado para consumir `/api/usuarios`. A seção **Agendamentos do servidor**, no topo da Agenda, está preparada para listar, criar, alterar status e excluir registros em `/api/agendamentos`. Ambas mostram a resposta de erro da API ao tentar consultar sem autenticação; não exibem dados locais como se fossem registros do servidor. A criação de agendamento pede IDs de veículo e serviço já existentes porque a API não devolve seus detalhes e ainda não há endpoint de veículos para preencher o formulário automaticamente. Os endpoints de clientes e serviços existem apenas no perfil `db` e não são usados nesta interface.
 
 O calendário abaixo dessa seção, o formulário público, o Dashboard, o Pátio/OS e o Financeiro ainda usam dados locais. Reservas do formulário público ficam no `localStorage` deste navegador e não são compartilhadas com o servidor nem com outros dispositivos. A agenda local começa vazia, sem agendamentos de exemplo. Esta entrega altera apenas o frontend.
 

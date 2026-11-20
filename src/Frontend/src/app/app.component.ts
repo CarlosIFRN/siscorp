@@ -3,12 +3,10 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { IconComponent } from './shared/icon.component';
-import { AuthService } from './core/auth.service';
 
 @Component({ selector: 'app-root', standalone: true, imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent], templateUrl: './app.component.html' })
 export class AppComponent {
   readonly router = inject(Router);
-  readonly auth = inject(AuthService);
   readonly layout = signal<'admin' | 'public'>('admin');
   readonly collapsed = signal(this.restoreSidebar());
   readonly mobileOpen = signal(false);
@@ -31,7 +29,6 @@ export class AppComponent {
     try { localStorage.setItem('cwos.sidebar.collapsed', this.collapsed() ? '1' : '0'); } catch { /* preferência opcional */ }
   }
   toggleAccountMenu(): void { this.accountMenuOpen.update(value => !value); this.accountPanel.set('menu'); }
-  signOut(): void { this.auth.signOut(); this.accountMenuOpen.set(false); void this.router.navigateByUrl('/entrar'); }
   @HostListener('document:click', ['$event']) onDocumentClick(event: MouseEvent): void {
     if (event.target instanceof Element && !event.target.closest('.admin-account')) this.accountMenuOpen.set(false);
   }

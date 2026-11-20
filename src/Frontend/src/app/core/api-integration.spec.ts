@@ -1,46 +1,28 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { AuthService, basicAuthInterceptor, ApiUser } from './auth.service';
-import { UsersApiService } from './users-api.service';
+import { ApiUser, UsersApiService } from './users-api.service';
 import { AppointmentsApiService } from './appointments-api.service';
 
 describe('integração HTTP da API', () => {
   let http: HttpTestingController;
-  let auth: AuthService;
   const admin: ApiUser = { id: 1, nome: 'Ana', email: 'ana@example.com', telefone: '84999990000',
     ativo: true, tipoUsuario: 'Admin' };
 
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [
-      provideHttpClient(withInterceptors([basicAuthInterceptor])), provideHttpClientTesting()
+      provideHttpClient(), provideHttpClientTesting()
     ] });
     http = TestBed.inject(HttpTestingController);
-    auth = TestBed.inject(AuthService);
   });
   afterEach(() => http.verify());
-
-  it('autentica com /api/auth/me, só envia Basic para /api e descarta as credenciais ao sair', async () => {
-    const login = auth.signIn(' ana@example.com ', 'senha1234');
-    const request = http.expectOne('/api/auth/me');
-    expect(request.request.headers.get('Authorization')).toBe(`Basic ${btoa('ana@example.com:senha1234')}`);
-    request.flush(admin);
-    expect((await login).nome).toBe('Ana');
-    expect(auth.user()).toEqual(admin);
-
-    auth.signOut();
-    const retry = auth.signIn('ana@example.com', 'errada');
-    const failed = http.expectOne('/api/auth/me');
-    failed.flush({}, { status: 401, statusText: 'Unauthorized' });
-    await expectAsync(retry).toBeRejected();
-    expect(auth.user()).toBeNull();
-  });
 
   it('envia o CRUD de usuários aos endpoints existentes', async () => {
     const api = TestBed.inject(UsersApiService);
     const list = api.list();
     const listed = http.expectOne('/api/usuarios');
     expect(listed.request.method).toBe('GET');
+    expect(listed.request.headers.has('Authorization')).toBeFalse();
     listed.flush([admin]);
     expect((await list)[0].email).toBe(admin.email);
 

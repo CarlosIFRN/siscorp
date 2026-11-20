@@ -1,9 +1,7 @@
 <section class="api-panel api-server-agenda" aria-labelledby="server-agenda-title">
-  <div class="api-panel-heading"><div><span class="admin-kicker">DADOS REAIS</span><h2 id="server-agenda-title">Agendamentos do servidor</h2><p>Registros persistidos no Spring Boot. A API retorna os IDs do veículo e do serviço, sem seus detalhes.</p></div>@if (canManage()) { <button type="button" (click)="load()" [disabled]="loading()">Atualizar</button> }</div>
-  @if (!auth.user()) { <div class="api-empty"><p>Entre para consultar e alterar os agendamentos do servidor.</p><a routerLink="/entrar">Entrar na API</a></div> }
-  @else if (!canManage()) { <p class="api-empty">Esta conta não tem acesso à agenda do servidor.</p> }
-  @else {
-    @if (error()) { <p class="api-form-error" role="alert">{{ error() }}</p> }
+  <div class="api-panel-heading"><div><span class="admin-kicker">API SPRING BOOT</span><h2 id="server-agenda-title">Agendamentos do servidor</h2><p>A API exige autenticação para consultar registros. Esta interface não envia credenciais.</p></div><button type="button" (click)="load()" [disabled]="loading()">Consultar API</button></div>
+  @if (loaded() && error()) { <p class="api-form-error" role="alert">{{ error() }}</p> }
+  @if (available()) {
     @if (notice()) { <p class="api-notice" role="status">{{ notice() }}</p> }
     @if (loading()) { <p class="api-empty">Carregando agendamentos…</p> }
     @else if (!items().length) { <p class="api-empty">Nenhum agendamento encontrado no servidor.</p> }

@@ -1,15 +1,15 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { ApiUser, AuthService, UserRole, apiError } from '../core/auth.service';
-import { UserInput, UsersApiService } from '../core/users-api.service';
+import { apiError } from '../core/api-error';
+import { ApiUser, UserInput, UsersApiService } from '../core/users-api.service';
 
-@Component({ selector: 'app-users', standalone: true, imports: [FormsModule, RouterLink], templateUrl: './users.component.html' })
-export class UsersComponent implements OnInit {
-  readonly auth = inject(AuthService);
+@Component({ selector: 'app-users', standalone: true, imports: [FormsModule], templateUrl: './users.component.html' })
+export class UsersComponent {
   private readonly api = inject(UsersApiService);
   readonly users = signal<ApiUser[]>([]);
   readonly loading = signal(false);
+  readonly loaded = signal(false);
+  readonly available = signal(false);
   readonly saving = signal(false);
   readonly error = signal('');
   readonly notice = signal('');
@@ -17,11 +17,10 @@ export class UsersComponent implements OnInit {
   readonly confirmingId = signal<number | null>(null);
   form: UserInput = this.emptyForm();
 
-  ngOnInit(): void { if (this.auth.user()?.tipoUsuario === 'Admin') void this.load(); }
   async load(): Promise<void> {
-    this.loading.set(true); this.error.set('');
-    try { this.users.set(await this.api.list()); }
-    catch (error) { this.error.set(apiError(error, 'Não foi possível carregar os usuários.')); }
+    this.loading.set(true); this.loaded.set(true); this.error.set('');
+    try { this.users.set(await this.api.list()); this.available.set(true); }
+    catch (error) { this.users.set([]); this.available.set(false); this.error.set(apiError(error, 'Não foi possível carregar os usuários.')); }
     finally { this.loading.set(false); }
   }
 
@@ -71,6 +70,6 @@ export class UsersComponent implements OnInit {
   }
 
   private emptyForm(): UserInput {
-    return { nome: '', email: '', telefone: '', senha: '', tipoUsuario: 'Funcionario' as UserRole };
+    return { nome: '', email: '', telefone: '', senha: '', tipoUsuario: 'Funcionario' };
   }
 }

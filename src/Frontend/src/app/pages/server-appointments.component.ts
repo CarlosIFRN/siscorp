@@ -1,31 +1,29 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AuthService, apiError } from '../core/auth.service';
+import { apiError } from '../core/api-error';
 import { AppointmentsApiService, ServerAppointment, ServerAppointmentStatus } from '../core/appointments-api.service';
 
 @Component({ selector: 'app-server-appointments', standalone: true,
-  imports: [FormsModule, RouterLink], templateUrl: './server-appointments.component.html' })
-export class ServerAppointmentsComponent implements OnInit {
-  readonly auth = inject(AuthService);
+  imports: [FormsModule], templateUrl: './server-appointments.component.html' })
+export class ServerAppointmentsComponent {
   private readonly api = inject(AppointmentsApiService);
   readonly items = signal<ServerAppointment[]>([]);
   readonly loading = signal(false);
+  readonly loaded = signal(false);
+  readonly available = signal(false);
   readonly saving = signal(false);
   readonly error = signal('');
   readonly notice = signal('');
   readonly confirmingId = signal<number | null>(null);
   readonly statuses: ServerAppointmentStatus[] = ['AGENDADO', 'EM_LAVAGEM', 'PRONTO', 'CONCLUIDO', 'CANCELADO'];
-  readonly canManage = () => this.auth.user()?.tipoUsuario === 'Admin' || this.auth.user()?.tipoUsuario === 'Funcionario';
   vehicleId: number | null = null;
   serviceId: number | null = null;
   dateTime = '';
 
-  ngOnInit(): void { if (this.canManage()) void this.load(); }
   async load(): Promise<void> {
-    this.loading.set(true); this.error.set('');
-    try { this.items.set(await this.api.list()); }
-    catch (error) { this.error.set(apiError(error, 'Não foi possível consultar a agenda do servidor.')); }
+    this.loading.set(true); this.loaded.set(true); this.error.set('');
+    try { this.items.set(await this.api.list()); this.available.set(true); }
+    catch (error) { this.items.set([]); this.available.set(false); this.error.set(apiError(error, 'Não foi possível consultar a agenda do servidor.')); }
     finally { this.loading.set(false); }
   }
   async create(): Promise<void> {
