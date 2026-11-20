@@ -8,24 +8,31 @@ import { IconComponent } from './shared/icon.component';
 export class AppComponent {
   readonly router = inject(Router);
   readonly layout = signal<'admin' | 'public'>('admin');
-  readonly page = signal('Dashboard');
   readonly collapsed = signal(this.restoreSidebar());
   readonly mobileOpen = signal(false);
+  readonly accountMenuOpen = signal(false);
+  readonly accountPanel = signal<'menu' | 'profile' | 'settings'>('menu');
   constructor() {
     this.router.events.pipe(filter(event => event instanceof NavigationEnd), takeUntilDestroyed()).subscribe(() => {
       const data = this.router.routerState.root.firstChild?.snapshot.data;
       this.layout.set(data?.['layout'] || 'admin');
-      this.page.set(data?.['label'] || 'Dashboard');
       this.mobileOpen.set(false);
+      this.accountMenuOpen.set(false);
+      this.accountPanel.set('menu');
       requestAnimationFrame(() => document.querySelector<HTMLElement>('h1')?.focus());
     });
   }
   toggleSidebar(): void {
     if (window.innerWidth <= 760) { this.mobileOpen.update(value => !value); return; }
+    this.accountMenuOpen.set(false);
     this.collapsed.update(value => !value);
     try { localStorage.setItem('cwos.sidebar.collapsed', this.collapsed() ? '1' : '0'); } catch { /* preferência opcional */ }
   }
-  @HostListener('document:keydown.escape') onEscape(): void { this.mobileOpen.set(false); }
-  @HostListener('window:resize') onResize(): void { if (window.innerWidth > 760) this.mobileOpen.set(false); }
+  toggleAccountMenu(): void { this.accountMenuOpen.update(value => !value); this.accountPanel.set('menu'); }
+  @HostListener('document:click', ['$event']) onDocumentClick(event: MouseEvent): void {
+    if (event.target instanceof Element && !event.target.closest('.admin-account')) this.accountMenuOpen.set(false);
+  }
+  @HostListener('document:keydown.escape') onEscape(): void { this.mobileOpen.set(false); this.accountMenuOpen.set(false); }
+  @HostListener('window:resize') onResize(): void { if (window.innerWidth > 760) this.mobileOpen.set(false); this.accountMenuOpen.set(false); }
   private restoreSidebar(): boolean { try { return localStorage.getItem('cwos.sidebar.collapsed') === '1'; } catch { return false; } }
 }
