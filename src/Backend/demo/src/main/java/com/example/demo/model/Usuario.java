@@ -1,13 +1,9 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "usuarios")
-@Getter
-@Setter
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +31,24 @@ public class Usuario {
 
     public Usuario() {}
 
+    public Integer getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
+
+    public String getNomeUsuario() { return nomeUsuario; }
+    public void setNomeUsuario(String nomeUsuario) { this.nomeUsuario = nomeUsuario; }
+
+    public String getEmailUsuario() { return emailUsuario; }
+    public void setEmailUsuario(String emailUsuario) { this.emailUsuario = emailUsuario; }
+
+    public String getSenhaHash() { return senhaHash; }
+    public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
+
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
+    public TipoUsuario getTipoUsuario() { return tipoUsuario; }
+    public void setTipoUsuario(TipoUsuario tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 }
