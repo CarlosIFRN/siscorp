@@ -4,6 +4,7 @@ package com.example.demo.service;
 import com.example.demo.dto.AtualizarUsuarioRequest;
 import com.example.demo.dto.CriarUsuarioRequest;
 import com.example.demo.dto.UsuarioResponse;
+import com.example.demo.model.TipoUsuario;
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
 
@@ -52,6 +53,7 @@ public class UsuarioService {
         usuario.setEmailUsuario(email);
         usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         usuario.setTelefone(request.telefone());
+        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
 
         return UsuarioResponse.de(repository.save(usuario));
     }
