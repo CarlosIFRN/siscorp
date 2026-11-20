@@ -17,12 +17,14 @@ Abra `http://localhost:4200`.
 | Rota | Conteúdo |
 | --- | --- |
 | `/agendar` | Formulário público: dados do cliente, veículo, serviço, data e hora na mesma página. |
-| `/dashboard` | Indicadores do dia e próximos atendimentos. |
+| `/dashboard` | Indicadores operacionais do dia, demanda dos próximos sete dias, mix de serviços, fila de atendimento e estrutura para indicadores financeiros. |
 | `/agenda` | Calendário mensal, semanal e diário, com busca, filtro e alteração de status. |
 
 ## Escopo desta entrega
 
 Esta entrega modifica apenas o frontend. A agenda começa vazia, sem agendamentos de exemplo. Reservas criadas pelo usuário ficam no `localStorage` deste navegador e não são compartilhadas com outros dispositivos. A API, autenticação e persistência em PostgreSQL ficam para a etapa de backend; o diretório `src/Backend` não faz parte desta alteração.
+
+O dashboard calcula os indicadores operacionais a partir da agenda local. Os indicadores financeiros aparecem sem valor até que pagamentos e ordens de serviço sejam integrados ao frontend; agendamentos não são tratados como receita recebida.
 
 ```powershell
 npm run build
