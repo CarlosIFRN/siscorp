@@ -29,6 +29,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
 
+                        .requestMatchers("/api/agendamentos", "/api/agendamentos/**")
+                        .hasAnyRole("ADMIN", "FUNCIONARIO")
+
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/servicos/ativos/**"
