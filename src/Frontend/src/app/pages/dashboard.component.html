@@ -1,10 +1,64 @@
-<div class="dashboard-page">
-  <div class="management-heading"><div><span class="admin-kicker">VISÃO GERAL DA OPERAÇÃO</span><h1 tabindex="-1">Dashboard</h1><p>Acompanhe os agendamentos e o andamento dos veículos em um só lugar.</p><span class="management-date"><app-icon name="calendar" /> {{ todayLabel }}</span></div><a routerLink="/agenda" class="admin-primary"><app-icon name="calendar" /> Abrir agenda</a></div>
+<div class="dashboard-page bi-dashboard">
+  <div class="bi-toolbar">
+    <span class="management-date"><app-icon name="calendar" /> {{ todayLabel() }}</span>
+    <span class="bi-source">Agenda deste navegador</span>
+  </div>
+
   @if (crm.error()) { <div class="admin-alert" role="alert">{{ crm.error() }} <button type="button" (click)="crm.refresh()">Tentar novamente</button></div> }
-  <div class="management-stats" aria-label="Indicadores da operação"><article><span class="stat-icon"><app-icon name="calendar" /></span><strong>{{ crm.today().length }}</strong><span>Agendamentos hoje</span><small>Reservas para esta data</small></article><article><span class="stat-icon blue"><app-icon name="clock" /></span><strong>{{ scheduled() }}</strong><span>Aguardando atendimento</span><small>Agendados na agenda</small></article><article><span class="stat-icon amber"><app-icon name="car" /></span><strong>{{ inProgress() }}</strong><span>Em lavagem</span><small>Veículos em atendimento</small></article><article><span class="stat-icon green"><app-icon name="checkCircle" /></span><strong>{{ ready() }}</strong><span>Prontos para entrega</span><small>Serviço concluído no pátio</small></article></div>
-  <div class="management-grid"><section class="management-card" aria-labelledby="upcoming-heading"><div class="management-card-header"><div><span class="admin-kicker">PRÓXIMOS ATENDIMENTOS</span><h2 id="upcoming-heading">Fila de agendamentos</h2></div><a routerLink="/agenda">Ver agenda completa <app-icon name="arrow" /></a></div>
-    @if (crm.loading()) { <p class="management-empty">Carregando agendamentos…</p> }
-    @else if (next().length) { <div class="management-table-wrap"><table class="management-table"><thead><tr><th>Cliente / veículo</th><th>Serviço</th><th>Data e hora</th><th>Status</th></tr></thead><tbody>@for (item of next(); track item.id) { <tr><td><strong>{{ item.customerName }}</strong><small>{{ item.vehicleModel }} · {{ item.licensePlate }}</small></td><td>{{ serviceName(item.service) }}</td><td>{{ formatSlot(item) }}</td><td><span class="status-pill" [class]="'status-pill ' + item.status.toLowerCase()">{{ statusName(item.status) }}</span></td></tr> }</tbody></table></div> }
-    @else { <div class="management-empty"><app-icon name="calendar" /><strong>Nenhum agendamento futuro</strong><p>As reservas feitas no formulário público aparecerão aqui.</p><a routerLink="/agendar">Abrir formulário público <app-icon name="arrow" /></a></div> }
-  </section><aside class="management-side"><section class="management-card quick-card"><span class="admin-kicker">ACESSO RÁPIDO</span><h2>Organize o dia</h2><p>Veja todos os horários e atualize o estado de cada atendimento na agenda.</p><a routerLink="/agenda"><app-icon name="calendar" /><span>Gerenciar agenda</span><app-icon name="chevron" /></a><a routerLink="/agendar"><app-icon name="link" /><span>Abrir formulário público</span><app-icon name="chevron" /></a></section><section class="management-card flow-card"><span class="admin-kicker">FLUXO DO PÁTIO</span><h2>Do agendamento à entrega</h2><ol><li>Agendado</li><li>Em lavagem</li><li>Pronto</li><li>Concluído</li></ol></section></aside></div>
+
+  <section aria-labelledby="operation-heading">
+    <div class="bi-section-heading"><div><span class="admin-kicker">OPERAÇÃO DE HOJE</span><h2 id="operation-heading">Situação do atendimento</h2></div><span>4 horários por dia · 13h às 16h</span></div>
+    <div class="management-stats bi-kpis">
+      <article><span class="stat-icon"><app-icon name="calendar" /></span><strong>{{ today().length }}</strong><span>Agendamentos hoje</span><small>{{ completedToday() }} concluído(s) nesta data</small></article>
+      <article><span class="stat-icon blue"><app-icon name="dashboard" /></span><strong>{{ occupancy() }}%</strong><span>Ocupação da agenda</span><small>{{ today().length }} dos 4 horários de hoje</small></article>
+      <article><span class="stat-icon amber"><app-icon name="car" /></span><strong>{{ inProgress() }}</strong><span>Em lavagem hoje</span><small>Atendimentos marcados em andamento</small></article>
+      <article><span class="stat-icon green"><app-icon name="checkCircle" /></span><strong>{{ ready() }}</strong><span>Prontos para entrega hoje</span><small>Atendimentos aguardando retirada</small></article>
+    </div>
+  </section>
+
+  <div class="bi-insights">
+    <section class="management-card bi-trend" aria-labelledby="demand-heading">
+      <div class="management-card-header"><div><span class="admin-kicker">DEMANDA</span><h2 id="demand-heading">Reservas nos próximos 7 dias</h2></div><strong class="bi-header-number">{{ nextSevenTotal() }} <small>reservas</small></strong></div>
+      @if (nextSevenTotal() > 0) {
+        <div class="bi-chart" role="list" aria-label="Quantidade de reservas por dia nos próximos sete dias">
+          @for (day of nextSevenDays(); track day.key) {
+            <div class="bi-chart-day" role="listitem" [attr.aria-label]="day.label + ': ' + day.count + ' reservas'"><strong>{{ day.count }}</strong><div class="bi-chart-track"><span [style.height.%]="day.height"></span></div><small>{{ day.label }}</small></div>
+          }
+        </div>
+      } @else { <div class="bi-chart-empty">Nenhuma reserva para os próximos 7 dias.</div> }
+      <p class="bi-card-note">Volume de horários reservados, incluindo atendimentos já concluídos hoje.</p>
+    </section>
+
+    <section class="management-card bi-mix" aria-labelledby="mix-heading">
+      <div class="management-card-header"><div><span class="admin-kicker">PORTFÓLIO</span><h2 id="mix-heading">Serviços agendados</h2></div></div>
+      @if (nextSevenTotal() > 0) {
+        <div class="bi-mix-list">
+          @for (service of serviceMix(); track service.name) {
+            <div class="bi-mix-row"><div><span>{{ service.name }}</span><strong>{{ service.count }} <small>({{ service.share }}%)</small></strong></div><div class="bi-mix-track"><span [style.width.%]="service.share"></span></div></div>
+          }
+        </div>
+      } @else { <div class="bi-chart-empty">O mix aparecerá após o primeiro agendamento.</div> }
+      <p class="bi-card-note">Participação de cada serviço nas reservas dos próximos 7 dias.</p>
+    </section>
+  </div>
+
+  <section class="management-card bi-finance" aria-labelledby="finance-heading">
+    <div class="management-card-header"><div><span class="admin-kicker">FINANCEIRO</span><h2 id="finance-heading">Recebimentos e caixa</h2></div><span class="bi-unavailable">Dados não integrados</span></div>
+    <div class="bi-finance-grid">
+      <div><span>Receita recebida</span><strong>—</strong><small>Somatório dos pagamentos confirmados</small></div>
+      <div><span>Ticket médio</span><strong>—</strong><small>Receita por ordem de serviço paga</small></div>
+      <div><span>Saldo a receber</span><strong>—</strong><small>Valor das OS ainda não quitadas</small></div>
+    </div>
+    <p class="bi-finance-note"><app-icon name="info" /> Os registros de pagamentos e ordens de serviço ainda não estão conectados a este frontend. Nenhum valor financeiro foi estimado a partir dos agendamentos.</p>
+  </section>
+
+  <div class="bi-bottom">
+    <section class="management-card" aria-labelledby="upcoming-heading">
+      <div class="management-card-header"><div><span class="admin-kicker">PRÓXIMOS ATENDIMENTOS</span><h2 id="upcoming-heading">Fila de agendamentos</h2></div><a routerLink="/agenda">Ver agenda completa <app-icon name="arrow" /></a></div>
+      @if (crm.loading()) { <p class="management-empty">Carregando agendamentos…</p> }
+      @else if (next().length) { <div class="management-table-wrap"><table class="management-table"><thead><tr><th>Cliente / veículo</th><th>Serviço</th><th>Data e hora</th><th>Status</th></tr></thead><tbody>@for (item of next(); track item.id) { <tr><td><strong>{{ item.customerName }}</strong><small>{{ item.vehicleModel }} · {{ item.licensePlate }}</small></td><td>{{ serviceName(item.service) }}</td><td>{{ formatSlot(item) }}</td><td><span class="status-pill" [class]="'status-pill ' + item.status.toLowerCase()">{{ statusName(item.status) }}</span></td></tr> }</tbody></table></div> }
+      @else { <div class="management-empty"><app-icon name="calendar" /><strong>Nenhum agendamento futuro</strong><p>As reservas feitas no formulário público aparecerão aqui.</p><a routerLink="/agendar">Abrir formulário público <app-icon name="arrow" /></a></div> }
+    </section>
+    <section class="management-card bi-attention" aria-labelledby="attention-heading"><span class="admin-kicker">ATENÇÃO OPERACIONAL</span><h2 id="attention-heading">Agendamentos sem atualização</h2><strong>{{ withoutUpdate() }}</strong><p>Horários já passados que continuam com status “Agendado”. Revise esses atendimentos na agenda.</p><a routerLink="/agenda">Revisar agenda <app-icon name="arrow" /></a></section>
+  </div>
 </div>

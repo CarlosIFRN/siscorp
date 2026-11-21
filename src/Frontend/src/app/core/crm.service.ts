@@ -29,19 +29,6 @@ export function formatSlot(item: { date: string; hour: number }): string {
   return `${new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).format(fromKey(item.date))} · ${item.hour}:00`;
 }
 
-function exampleAppointments(): Appointment[] {
-  const today = new Date();
-  const day = (offset: number): string => { const date = new Date(today); date.setDate(today.getDate() + offset); return dateKey(date); };
-  const base = { phone: '(84) 99999-0000', email: 'exemplo@cwos.local', vehicleType: 'Carro', vehicleColor: 'Prata', createdAt: today.toISOString() };
-  return [
-    { ...base, id: 1, customerName: 'Cliente exemplo · Ana', vehicleModel: 'Honda Civic', licensePlate: 'ABC-1234', service: 'SIMPLES', date: day(0), hour: 13, status: 'AGENDADO' },
-    { ...base, id: 2, customerName: 'Cliente exemplo · Bruno', vehicleModel: 'Toyota Corolla', licensePlate: 'DEF-5678', service: 'COMPLETA', date: day(0), hour: 15, status: 'EM_LAVAGEM' },
-    { ...base, id: 3, customerName: 'Cliente exemplo · Carla', vehicleModel: 'Fiat Argo', licensePlate: 'GHI-9012', service: 'ENCERAMENTO', date: day(1), hour: 14, status: 'AGENDADO' },
-    { ...base, id: 4, customerName: 'Cliente exemplo · Diego', vehicleModel: 'Hyundai HB20', licensePlate: 'JKL-3456', service: 'SIMPLES', date: day(0), hour: 16, status: 'PRONTO' },
-    { ...base, id: 5, customerName: 'Cliente exemplo · Elisa', vehicleModel: 'Chevrolet Onix', licensePlate: 'PQR-3456', service: 'COMPLETA', date: day(3), hour: 16, status: 'AGENDADO' }
-  ];
-}
-
 @Injectable({ providedIn: 'root' })
 export class CrmService {
   readonly appointments = signal<Appointment[]>(this.read());
@@ -81,11 +68,14 @@ export class CrmService {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed: unknown = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed as Appointment[] : [];
+        if (!Array.isArray(parsed)) return [];
+        const appointments = (parsed as Appointment[]).filter(item =>
+          !(item.email === 'exemplo@cwos.local' && item.customerName?.startsWith('Cliente exemplo · '))
+        );
+        if (appointments.length !== parsed.length) localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+        return appointments;
       }
-      const examples = exampleAppointments();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(examples));
-      return examples;
+      return [];
     } catch {
       return [];
     }

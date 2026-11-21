@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import org.springframework.context.annotation.Profile;
 
-import com.example.demo.model.Servico;
+import com.example.demo.dto.ServicoRequestDTO;
+import com.example.demo.dto.ServicoResponseDTO;
 import com.example.demo.service.ServicoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,26 +24,31 @@ public class ServicoController {
     }
 
     @GetMapping("/ativos/{idEmpresa}")
-    public ResponseEntity<List<Servico>> listarAtivos(
+    public ResponseEntity<List<ServicoResponseDTO>> listarAtivos(
             @PathVariable Integer idEmpresa) {
 
         return ResponseEntity.ok(
-                service.listarAtivos(idEmpresa));
+                service.listarAtivos(idEmpresa).stream()
+                        .map(ServicoResponseDTO::de)
+                        .toList());
     }
 
     @GetMapping("/empresa/{idEmpresa}")
-    public ResponseEntity<List<Servico>> listarTodos(
+    public ResponseEntity<List<ServicoResponseDTO>> listarTodos(
             @PathVariable Integer idEmpresa) {
 
         return ResponseEntity.ok(
-                service.listarTodos(idEmpresa));
+                service.listarTodos(idEmpresa).stream()
+                        .map(ServicoResponseDTO::de)
+                        .toList());
     }
 
     @PostMapping
-    public ResponseEntity<Servico> cadastrar(
-            @RequestBody Servico servico) {
+    public ResponseEntity<ServicoResponseDTO> cadastrar(
+            @Valid @RequestBody ServicoRequestDTO request) {
 
-        Servico criado = service.cadastrar(servico);
+        ServicoResponseDTO criado = ServicoResponseDTO.de(
+                service.cadastrar(request.toEntity()));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -49,12 +56,12 @@ public class ServicoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Servico> atualizar(
+    public ResponseEntity<ServicoResponseDTO> atualizar(
             @PathVariable Integer id,
-            @RequestBody Servico servico) {
+            @Valid @RequestBody ServicoRequestDTO request) {
 
-        return ResponseEntity.ok(
-                service.atualizar(id, servico));
+        return ResponseEntity.ok(ServicoResponseDTO.de(
+                service.atualizar(id, request.toEntity())));
     }
 
     @DeleteMapping("/{id}")

@@ -1,19 +1,18 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.AtualizarUsuarioRequest;
-import com.example.demo.dto.CriarUsuarioRequest;
-import com.example.demo.dto.UsuarioResponse;
+import com.example.demo.dto.UsuarioRequestDTO;
+import com.example.demo.dto.UsuarioResponseDTO;
 import com.example.demo.model.Usuario;
+import com.example.demo.model.TipoUsuario;
 import com.example.demo.repository.UsuarioRepository;
 import java.util.List;
 import java.util.Locale;
-import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-@Profile("memory")
 @Service
 public class UsuarioService {
     private final UsuarioRepository repository;
@@ -24,42 +23,57 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UsuarioResponse> listar() {
-        return repository.findAll().stream().map(UsuarioResponse::de).toList();
+    public List<UsuarioResponseDTO> listar() {
+        return repository.findAllByOrderByIdUsuarioAsc().stream().map(UsuarioResponseDTO::de).toList();
     }
 
-    public UsuarioResponse buscar(Integer id) {
-        return UsuarioResponse.de(encontrar(id));
+    public UsuarioResponseDTO buscar(Integer id) {
+        return UsuarioResponseDTO.de(encontrar(id));
     }
 
-    public synchronized UsuarioResponse criar(CriarUsuarioRequest request) {
+    public synchronized UsuarioResponseDTO criar(UsuarioRequestDTO request) {
         String email = normalizarEmail(request.email());
         validarEmailUnico(email, null);
         Usuario usuario = new Usuario();
         usuario.setNomeUsuario(request.nome().trim());
         usuario.setEmailUsuario(email);
         usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
-        usuario.setTelefone(request.telefone());
-        return UsuarioResponse.de(repository.save(usuario));
+        usuario.setTelefone(request.telefone().trim());
+        usuario.setTipoUsuario(request.tipoUsuario() == null ? TipoUsuario.Funcionario : request.tipoUsuario());
+        return UsuarioResponseDTO.de(salvar(usuario));
     }
 
-    public synchronized UsuarioResponse atualizar(Integer id, AtualizarUsuarioRequest request) {
+    public synchronized UsuarioResponseDTO atualizar(Integer id, UsuarioRequestDTO request) {
         Usuario usuario = encontrar(id);
+        if (request.tipoUsuario() != null && request.tipoUsuario() != TipoUsuario.Admin) {
+            protegerUltimoAdmin(usuario);
+        }
         String email = normalizarEmail(request.email());
         validarEmailUnico(email, id);
         usuario.setNomeUsuario(request.nome().trim());
         usuario.setEmailUsuario(email);
-        usuario.setTelefone(request.telefone());
+        usuario.setTelefone(request.telefone().trim());
+        if (request.tipoUsuario() != null) {
+            usuario.setTipoUsuario(request.tipoUsuario());
+        }
         if (request.senha() != null) {
             usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         }
-        return UsuarioResponse.de(repository.save(usuario));
+        return UsuarioResponseDTO.de(salvar(usuario));
     }
 
     public synchronized void desativar(Integer id) {
         Usuario usuario = encontrar(id);
+        protegerUltimoAdmin(usuario);
         usuario.setAtivo(false);
-        repository.save(usuario);
+        salvar(usuario);
+    }
+
+    private void protegerUltimoAdmin(Usuario usuario) {
+        if (usuario.isAtivo() && usuario.getTipoUsuario() == TipoUsuario.Admin
+                && repository.countByTipoUsuarioAndAtivoTrue(TipoUsuario.Admin) <= 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Não é possível remover o último administrador ativo");
+        }
     }
 
     private Usuario encontrar(Integer id) {
@@ -68,8 +82,19 @@ public class UsuarioService {
     }
 
     private void validarEmailUnico(String email, Integer ignorarId) {
-        if (repository.existsByEmail(email, ignorarId)) {
+        boolean existente = ignorarId == null
+                ? repository.existsByEmailUsuario(email)
+                : repository.existsByEmailUsuarioAndIdUsuarioNot(email, ignorarId);
+        if (existente) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado");
+        }
+    }
+
+    private Usuario salvar(Usuario usuario) {
+        try {
+            return repository.saveAndFlush(usuario);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado", ex);
         }
     }
 

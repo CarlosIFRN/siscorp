@@ -1,43 +1,16 @@
 package com.example.demo.repository;
 
-import org.springframework.context.annotation.Profile;
-
 import com.example.demo.model.Usuario;
-import java.util.Comparator;
+import com.example.demo.model.TipoUsuario;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Profile("memory")
-@Repository
-public class UsuarioRepository {
-    private final Map<Integer, Usuario> usuarios = new ConcurrentHashMap<>();
-    private final AtomicInteger sequencia = new AtomicInteger();
-
-    public List<Usuario> findAll() {
-        return usuarios.values().stream()
-                .sorted(Comparator.comparing(Usuario::getIdUsuario))
-                .toList();
-    }
-
-    public Optional<Usuario> findById(Integer id) {
-        return Optional.ofNullable(usuarios.get(id));
-    }
-
-    public boolean existsByEmail(String email, Integer ignorarId) {
-        return usuarios.values().stream().anyMatch(usuario ->
-                usuario.getEmailUsuario().equals(email)
-                        && !usuario.getIdUsuario().equals(ignorarId));
-    }
-
-    public Usuario save(Usuario usuario) {
-        if (usuario.getIdUsuario() == null) {
-            usuario.setIdUsuario(sequencia.incrementAndGet());
-        }
-        usuarios.put(usuario.getIdUsuario(), usuario);
-        return usuario;
-    }
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    List<Usuario> findAllByOrderByIdUsuarioAsc();
+    boolean existsByEmailUsuario(String email);
+    boolean existsByEmailUsuarioAndIdUsuarioNot(String email, Integer id);
+    boolean existsByTipoUsuarioAndAtivoTrue(TipoUsuario tipoUsuario);
+    long countByTipoUsuarioAndAtivoTrue(TipoUsuario tipoUsuario);
+    Optional<Usuario> findByEmailUsuario(String email);
 }

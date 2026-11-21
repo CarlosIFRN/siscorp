@@ -1,0 +1,13 @@
+<section class="api-panel api-server-agenda" aria-labelledby="server-agenda-title">
+  <div class="api-panel-heading"><div><span class="admin-kicker">API SPRING BOOT</span><h2 id="server-agenda-title">Agendamentos do servidor</h2><p>A API exige autenticação para consultar registros. Esta interface não envia credenciais.</p></div><button type="button" (click)="load()" [disabled]="loading()">Consultar API</button></div>
+  @if (loaded() && error()) { <p class="api-form-error" role="alert">{{ error() }}</p> }
+  @if (available()) {
+    @if (notice()) { <p class="api-notice" role="status">{{ notice() }}</p> }
+    @if (loading()) { <p class="api-empty">Carregando agendamentos…</p> }
+    @else if (!items().length) { <p class="api-empty">Nenhum agendamento encontrado no servidor.</p> }
+    @else { <div class="api-table-wrap"><table class="api-table"><thead><tr><th>Data/hora</th><th>OS de agenda</th><th>Veículo</th><th>Serviço</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+      @for (item of items(); track item.idAgendamento) { <tr><td>{{ formatDateTime(item.dataHora) }}</td><td>#{{ item.idAgendamento }}</td><td>#{{ item.idVeiculo }}</td><td>#{{ item.idServico }}</td><td><label class="sr-only" [for]="'server-status-' + item.idAgendamento">Status do agendamento #{{ item.idAgendamento }}</label><select [id]="'server-status-' + item.idAgendamento" [value]="item.status" [disabled]="saving()" (change)="changeStatus(item, $any($event.target).value)">@for (status of statuses; track status) { <option [value]="status">{{ status }}</option> }</select></td><td><div class="api-row-actions"><button type="button" [disabled]="saving()" (click)="delete(item)">{{ confirmingId() === item.idAgendamento ? 'Confirmar exclusão' : 'Excluir' }}</button>@if (confirmingId() === item.idAgendamento) { <button type="button" (click)="confirmingId.set(null)">Cancelar</button> }</div></td></tr> }
+    </tbody></table></div> }
+    <form class="api-inline-form" (ngSubmit)="create()"><h3>Novo agendamento no servidor</h3><p>Informe IDs de veículo e serviço já cadastrados no backend. O formulário público abaixo ainda usa dados locais.</p><div><label>ID do veículo<input name="vehicleId" type="number" min="1" [(ngModel)]="vehicleId" required></label><label>ID do serviço<input name="serviceId" type="number" min="1" [(ngModel)]="serviceId" required></label><label>Data e hora<input name="dateTime" type="datetime-local" [(ngModel)]="dateTime" required></label><button type="submit" class="admin-primary" [disabled]="saving()">Criar no servidor</button></div></form>
+  }
+</section>

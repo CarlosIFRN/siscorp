@@ -1,0 +1,76 @@
+<section class="os-page" aria-labelledby="os-page-title">
+  <header class="os-page-header">
+    <div><span class="admin-kicker">OPERAÇÃO DO PÁTIO</span><h1 id="os-page-title" tabindex="-1">Pátio / Ordens de Serviço</h1><p>Veículos que chegaram e etapas do atendimento. Valores de serviços nesta demonstração são locais.</p></div>
+    <div class="os-header-actions"><button id="os-open-checkin" type="button" class="os-action-secondary" (click)="openForm('checkin')"><app-icon name="calendar" /> Check-in de agendamento</button><button id="os-open-walkin" type="button" class="os-action-primary" (click)="openForm('walkin')">+ OS sem agendamento</button></div>
+  </header>
+
+  <div class="os-summary" aria-label="Resumo do pátio"><span><strong>{{ openCount() }}</strong> OS aberta{{ openCount() === 1 ? '' : 's' }}</span><span><strong>{{ readyCount() }}</strong> pronta{{ readyCount() === 1 ? '' : 's' }} para entrega</span><span><strong>{{ availableAppointments().length }}</strong> agendamento{{ availableAppointments().length === 1 ? '' : 's' }} para check-in</span></div>
+  @if (patio.error()) { <div class="os-alert" role="alert">{{ patio.error() }} <button type="button" (click)="patio.refresh()">Tentar novamente</button></div> }
+  <div class="os-search"><label><app-icon name="search" /><span class="sr-only">Buscar por placa, veículo, cliente ou funcionário</span><input type="search" placeholder="Buscar placa, veículo, cliente ou funcionário" [value]="search()" (input)="search.set($any($event.target).value)"></label><span>{{ filteredOrders().length }} OS exibida{{ filteredOrders().length === 1 ? '' : 's' }}</span></div>
+
+  @if (patio.orders().length === 0 && !patio.error()) { <div class="os-board-empty"><app-icon name="car" /><strong>O pátio está vazio</strong><p>Faça o check-in de um agendamento ou abra uma OS para um veículo que chegou sem reserva.</p></div> }
+  <div class="os-board" aria-label="Quadro de ordens de serviço">
+    @for (stage of stages; track stage.id) {
+      <section class="os-column" [class]="'os-column os-stage-' + stage.id.toLowerCase()" [attr.aria-label]="stage.name + ', ' + ordersBy(stage.id).length + ' ordens de serviço'">
+        <div class="os-column-heading"><h2>{{ stage.name }}</h2><span>{{ ordersBy(stage.id).length }}</span></div>
+        <div class="os-column-body">
+          @for (order of ordersBy(stage.id); track order.id) {
+            <button type="button" class="os-card" [id]="'os-card-' + order.id" [attr.aria-label]="'Abrir OS ' + order.id + ', placa ' + order.plate + ', ' + order.customer + ', ' + stage.name" (click)="openDetails(order.id)">
+              <span class="os-card-top"><strong>{{ order.plate }}</strong><small>#{{ order.id }}</small></span>
+              <span class="os-card-vehicle">{{ order.vehicle }}</span>
+              <span class="os-card-row"><app-icon name="user" /> {{ order.customer }}</span>
+              <span class="os-card-row"><app-icon name="drop" /> {{ order.services[0].name }}@if (order.services.length > 1) { <small>+{{ order.services.length - 1 }}</small> }</span>
+              <span class="os-card-divider"></span>
+              <span class="os-card-row"><app-icon name="clock" /> Entrada {{ formatDateTime(order.enteredAt) }}</span>
+              <span class="os-card-row"><app-icon name="shield" /> {{ order.responsible }}</span>
+            </button>
+          } @empty { <p class="os-column-empty">Nenhum veículo nesta etapa.</p> }
+        </div>
+      </section>
+    }
+  </div>
+</section>
+
+@if (mode()) {
+  <div class="os-overlay" (click)="closeForm()"><section class="os-dialog os-form-dialog" role="dialog" aria-modal="true" aria-labelledby="os-form-title" (click)="$event.stopPropagation()">
+    <div class="os-dialog-heading"><div><span class="admin-kicker">NOVA ORDEM DE SERVIÇO</span><h2 id="os-form-title" tabindex="-1">{{ mode() === 'checkin' ? 'Check-in de agendamento' : 'Atendimento sem agendamento' }}</h2></div><button type="button" class="os-icon-button" aria-label="Fechar formulário" (click)="closeForm()"><app-icon name="close" /></button></div>
+    @if (mode() === 'checkin') {
+      <form class="os-form" novalidate (ngSubmit)="checkIn()">
+        @if (availableAppointments().length) {
+          <label>Agendamento existente <span>*</span><select name="appointment" [(ngModel)]="checkinAppointmentId" required><option [ngValue]="null">Selecione uma reserva</option>@for (item of availableAppointments(); track item.id) { <option [ngValue]="item.id">{{ formatSlot(item) }} · {{ item.licensePlate }} · {{ item.customerName }}</option> }</select></label>
+        } @else { <div class="os-form-empty">Nenhum agendamento disponível para check-in. <a routerLink="/agenda" (click)="closeForm()">Consultar agenda</a></div> }
+        <label>Funcionário responsável <span>*</span><input name="responsible" [(ngModel)]="checkinResponsible" maxlength="100" autocomplete="name" placeholder="Nome do funcionário" required></label>
+        <label>Observações <textarea name="notes" [(ngModel)]="checkinNotes" rows="3" maxlength="1000" placeholder="Avarias, preferências ou instruções"></textarea></label>
+        @if (formError()) { <p class="os-inline-error" role="alert">{{ formError() }}</p> }
+        <div class="os-form-actions"><button type="button" class="os-action-secondary" (click)="closeForm()">Cancelar</button><button type="submit" class="os-action-primary" [disabled]="!availableAppointments().length || !!patio.error()">Fazer check-in</button></div>
+      </form>
+    } @else {
+      <form class="os-form" novalidate (ngSubmit)="openWalkIn()">
+        <div class="os-form-row"><label>Placa <span>*</span><input name="plate" [(ngModel)]="walkIn.plate" maxlength="8" autocomplete="off" placeholder="ABC-1234" required></label><label>Veículo <span>*</span><input name="vehicle" [(ngModel)]="walkIn.vehicle" maxlength="100" placeholder="Ex.: Honda Civic" required></label></div>
+        <label>Cliente <span>*</span><input name="customer" [(ngModel)]="walkIn.customer" maxlength="100" autocomplete="name" placeholder="Nome do cliente" required></label>
+        <label>Serviço principal <span>*</span><select name="service" [(ngModel)]="walkIn.service" required>@for (service of baseServices; track service.id) { <option [value]="service.id">{{ service.name }} · {{ formatMoney(service.priceCents) }}</option> }</select></label>
+        <label>Funcionário responsável <span>*</span><input name="responsible" [(ngModel)]="walkIn.responsible" maxlength="100" placeholder="Nome do funcionário" required></label>
+        <label>Observações <textarea name="notes" [(ngModel)]="walkIn.notes" rows="3" maxlength="1000" placeholder="Avarias, preferências ou instruções"></textarea></label>
+        @if (formError()) { <p class="os-inline-error" role="alert">{{ formError() }}</p> }
+        <div class="os-form-actions"><button type="button" class="os-action-secondary" (click)="closeForm()">Cancelar</button><button type="submit" class="os-action-primary" [disabled]="!!patio.error()">Abrir OS</button></div>
+      </form>
+    }
+  </section></div>
+}
+
+@if (selectedOrder(); as order) {
+  <div class="os-overlay" (click)="closeDetails()"><aside class="os-dialog os-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="os-detail-title" (click)="$event.stopPropagation()">
+    <div class="os-dialog-heading"><div><span class="admin-kicker">ORDEM DE SERVIÇO #{{ order.id }}</span><h2 id="os-detail-title" tabindex="-1">{{ order.plate }} <small>{{ order.vehicle }}</small></h2></div><button type="button" class="os-icon-button" aria-label="Fechar OS" (click)="closeDetails()"><app-icon name="close" /></button></div>
+    <div class="os-detail-scroll">
+      @if (notice()) { <p class="os-notice" role="status">{{ notice() }}</p> }
+      @if (detailError()) { <p class="os-inline-error" role="alert">{{ detailError() }}</p> }
+      <div class="os-detail-status"><span class="os-stage-pill">{{ stageName(order.stage) }}</span><span class="os-payment-pill" [class.is-paid]="order.paymentStatus === 'PAGO'">{{ order.paymentStatus === 'PAGO' ? 'Pago' : 'Pendente de pagamento' }}</span></div>
+      <dl class="os-detail-meta"><div><dt>Cliente</dt><dd>{{ order.customer }}</dd></div><div><dt>Entrada</dt><dd>{{ formatDateTime(order.enteredAt) }}</dd></div><div><dt>Responsável atual</dt><dd>{{ order.responsible }}</dd></div><div><dt>Origem</dt><dd>{{ order.appointmentId === null ? 'Atendimento sem agendamento' : 'Agendamento #' + order.appointmentId }}</dd></div></dl>
+      <section class="os-detail-section"><h3>Serviços e valores</h3><div class="os-lines">@for (line of order.services; track line.code) { <div class="os-line"><div><strong>{{ line.name }}</strong><small>{{ line.kind === 'BASE' ? 'Serviço principal' : 'Extra' }}</small></div><span>{{ formatMoney(line.priceCents) }}</span>@if (line.kind === 'EXTRA' && order.stage !== 'ENTREGUE') { <button type="button" class="os-remove-extra" [attr.aria-label]="'Remover ' + line.name" (click)="removeExtra(order, line.code)"><app-icon name="close" /></button> }</div> }</div><div class="os-total"><span>Total da OS</span><strong>{{ formatMoney(orderTotal(order)) }}</strong></div><p class="os-pricing-note">Valores demonstrativos desta interface; pagamento não é registrado aqui.</p></section>
+      @if (order.stage !== 'ENTREGUE' && availableExtras(order).length) { <section class="os-detail-section"><h3>Adicionar serviço extra</h3><form class="os-extra-form" (ngSubmit)="addExtra(order)"><label><span class="sr-only">Serviço extra</span><select name="extra" [(ngModel)]="extraCode"><option [ngValue]="null">Selecione um extra</option>@for (extra of availableExtras(order); track extra.id) { <option [ngValue]="extra.id">{{ extra.name }} · {{ formatMoney(extra.priceCents) }}</option> }</select></label><button type="submit" class="os-action-secondary">Adicionar</button></form></section> }
+      <section class="os-detail-section"><h3>Observações</h3><p class="os-notes">{{ order.notes || 'Nenhuma observação registrada.' }}</p></section>
+      <section class="os-detail-section"><h3>Histórico de status</h3><ol class="os-history">@for (entry of order.history; track $index) { <li><strong>{{ stageName(entry.stage) }}</strong><span>{{ formatDateTime(entry.at) }} · {{ entry.by }}</span></li> }</ol></section>
+      @if (nextStage(order.stage); as next) { <section class="os-detail-section os-next-stage"><h3>Próxima etapa</h3><p>As etapas seguem a ordem do quadro. Cada mudança registra horário e responsável.</p><form (ngSubmit)="advance(order)"><label>Funcionário responsável <input name="stepResponsible" [(ngModel)]="stepResponsible" maxlength="100" required></label><button type="submit" class="os-action-primary">{{ next === 'ENTREGUE' ? 'Registrar entrega' : 'Mover para ' + stageName(next) }}</button></form></section> }
+    </div>
+  </aside></div>
+}
