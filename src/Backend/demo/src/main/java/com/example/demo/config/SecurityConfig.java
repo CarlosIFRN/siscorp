@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import jakarta.servlet.DispatcherType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -98,7 +99,14 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+
                         .requestMatchers("/api/auth/**").permitAll()
+
+                        .requestMatchers(
+                                "/api/clientes",
+                                "/api/clientes/**"
+                        ).hasAnyRole("ADMIN", "FUNCIONARIO")
 
                         .requestMatchers(
                                 "/api/usuarios",

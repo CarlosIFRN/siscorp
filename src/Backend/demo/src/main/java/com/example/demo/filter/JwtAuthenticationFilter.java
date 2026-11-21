@@ -49,8 +49,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String email = jwtService.extrairEmail(token);
 
+            System.out.println("JWT - Email extraído: " + email);
+
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails usuario = userDetailsService.loadUserByUsername(email);
+
+                boolean tokenValido =
+                        jwtService.validarToken(token, usuario.getUsername());
+
+                System.out.println("JWT - Usuário encontrado: " + usuario.getUsername());
+                System.out.println("JWT - Usuário habilitado: " + usuario.isEnabled());
+                System.out.println("JWT - Token válido: " + tokenValido);
+                System.out.println("JWT - Autoridades: " + usuario.getAuthorities());
 
                 if (usuario.isEnabled()
                         && jwtService.validarToken(token, usuario.getUsername())) {
@@ -72,7 +82,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (JwtException | IllegalArgumentException
                  | UsernameNotFoundException e) {
-            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);

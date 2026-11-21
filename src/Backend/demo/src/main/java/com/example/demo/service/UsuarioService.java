@@ -53,7 +53,7 @@ public class UsuarioService {
         usuario.setEmailUsuario(email);
         usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         usuario.setTelefone(request.telefone());
-        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
+        usuario.setTipoUsuario(request.tipoUsuario());
 
         return UsuarioResponse.de(repository.save(usuario));
     }
