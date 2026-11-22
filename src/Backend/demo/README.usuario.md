@@ -1,5 +1,7 @@
 # CRUD de usuários
 
+O backend requer Java 25 LTS.
+
 O perfil padrão `local` usa um banco H2 em arquivo (`data/cwos.mv.db`). Os usuários permanecem salvos após reiniciar o backend. O `UsuarioRepository` usa Spring Data JPA em todos os perfis.
 
 No Windows, a partir de `src/Backend/demo`:
