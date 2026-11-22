@@ -1,0 +1,111 @@
+<div class="auth-screen">
+  <section class="auth-showcase" aria-label="Sobre o CWOS">
+    <a class="auth-brand" routerLink="/login" aria-label="CWOS, página de acesso">
+      <span class="auth-brand-mark"><app-icon name="drop" /></span>
+      <span><strong>CWOS</strong><small>GESTÃO DO LAVA-JATO</small></span>
+    </a>
+
+    <div class="auth-showcase-copy">
+      <span class="auth-overline">GESTÃO EM UM SÓ LUGAR</span>
+      <h1>Mais tempo para cuidar do que importa.</h1>
+      <p>Agenda, operação e financeiro conectados para o seu lava-jato seguir em frente.</p>
+    </div>
+
+    <div class="auth-preview-card">
+      <span class="auth-preview-icon"><app-icon name="shield" /></span>
+      <span><small>SEU ESPAÇO DE TRABALHO</small><strong>Seu negócio, em um só lugar</strong></span>
+      <span class="auth-preview-status"><i></i> Acesso</span>
+    </div>
+
+    <footer>© 2026 CWOS · Gestão inteligente para o seu negócio</footer>
+  </section>
+
+  <main class="auth-main">
+    <div class="auth-form-wrap">
+      <a class="auth-mobile-brand" routerLink="/login" aria-label="CWOS, página de acesso">
+        <span class="auth-brand-mark"><app-icon name="drop" /></span><strong>CWOS</strong>
+      </a>
+
+      <span class="auth-overline auth-overline-dark">ACESSO À CONTA</span>
+      <h2>Entre no seu espaço</h2>
+      <p class="auth-intro">Entre com seu e-mail e senha ou use uma conta corporativa.</p>
+
+      <form class="auth-login-form" (ngSubmit)="signIn()" novalidate>
+        <label for="login-email">E-mail</label>
+        <input
+          id="login-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          placeholder="voce@empresa.com"
+          [formControl]="email"
+          [attr.aria-invalid]="email.invalid && email.touched"
+          [attr.aria-describedby]="email.invalid && email.touched ? 'email-error' : null"
+        >
+        @if (email.invalid && email.touched) {
+          <span id="email-error" class="auth-field-error" role="alert">Digite um endereço de e-mail válido.</span>
+        }
+        <div class="auth-password-heading">
+          <label for="login-password">Senha</label>
+          <button type="button" class="auth-forgot-button" (click)="requestPasswordReset()">Esqueci minha senha</button>
+        </div>
+        <div class="auth-password-field">
+          <input
+            id="login-password"
+            name="password"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            autocomplete="current-password"
+            required
+            placeholder="Digite sua senha"
+            [formControl]="password"
+            [attr.aria-invalid]="password.invalid && password.touched"
+            [attr.aria-describedby]="password.invalid && password.touched ? 'password-error' : null"
+          >
+          <button
+            type="button"
+            class="auth-password-toggle"
+            [attr.aria-label]="passwordVisible() ? 'Ocultar senha' : 'Mostrar senha'"
+            [attr.aria-pressed]="passwordVisible()"
+            (click)="togglePasswordVisibility()"
+          >{{ passwordVisible() ? 'Ocultar' : 'Mostrar' }}</button>
+        </div>
+        @if (password.invalid && password.touched) {
+          <span id="password-error" class="auth-field-error" role="alert">Digite sua senha.</span>
+        }
+        <button class="auth-email-button" type="submit">Entrar <app-icon name="arrow" /></button>
+      </form>
+
+      <div class="auth-divider"><span>ou continue com</span></div>
+
+      <div class="auth-provider-buttons">
+        <button type="button" class="auth-provider-button" (click)="showProviderNotice('Google')">
+          <svg class="auth-provider-logo" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.9 6.1-15z"/>
+            <path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44z"/>
+            <path fill="#FBBC05" d="M12.6 27.5a12 12 0 0 1 0-7V15.3H5.8a20 20 0 0 0 0 17.4z"/>
+            <path fill="#EA4335" d="M24 12.1c3 0 5.8 1 7.9 3.1l5.9-5.9C34.2 5.9 29.5 4 24 4A20 20 0 0 0 5.8 15.3l6.8 5.2c1.6-4.8 6.1-8.4 11.4-8.4z"/>
+          </svg>
+          Continuar com Google
+        </button>
+        <button type="button" class="auth-provider-button" (click)="showProviderNotice('Microsoft')">
+          <svg class="auth-provider-logo" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#f25022" d="M1 1h10v10H1z"/>
+            <path fill="#7fba00" d="M13 1h10v10H13z"/>
+            <path fill="#00a4ef" d="M1 13h10v10H1z"/>
+            <path fill="#ffb900" d="M13 13h10v10H13z"/>
+          </svg>
+          Continuar com Microsoft
+        </button>
+      </div>
+
+      @if (notice()) {
+        <p class="auth-notice" role="status">{{ notice() }}</p>
+      }
+
+      <p class="auth-demo-note"><app-icon name="info" /> Demonstração: a autenticação por senha e SSO ainda não está conectada.</p>
+    </div>
+
+    <footer class="auth-main-footer">É cliente? <a routerLink="/agendar">Agende uma lavagem <app-icon name="arrow" /></a></footer>
+  </main>
+</div>
