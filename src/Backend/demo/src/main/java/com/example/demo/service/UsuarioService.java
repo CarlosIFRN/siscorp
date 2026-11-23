@@ -5,22 +5,28 @@ import com.example.demo.dto.UsuarioResponseDTO;
 import com.example.demo.model.Usuario;
 import com.example.demo.model.TipoUsuario;
 import com.example.demo.repository.UsuarioRepository;
+import com.example.demo.repository.SessaoRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsuarioService {
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final SessaoRepository sessoes;
 
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder,
+            SessaoRepository sessoes) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.sessoes = sessoes;
     }
 
     public List<UsuarioResponseDTO> listar() {
@@ -43,6 +49,7 @@ public class UsuarioService {
         return UsuarioResponseDTO.de(salvar(usuario));
     }
 
+    @Transactional
     public synchronized UsuarioResponseDTO atualizar(Integer id, UsuarioRequestDTO request) {
         Usuario usuario = encontrar(id);
         if (request.tipoUsuario() != null && request.tipoUsuario() != TipoUsuario.Admin) {
@@ -58,14 +65,17 @@ public class UsuarioService {
         }
         if (request.senha() != null) {
             usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
+            sessoes.revogarPorUsuario(id, Instant.now());
         }
         return UsuarioResponseDTO.de(salvar(usuario));
     }
 
+    @Transactional
     public synchronized void desativar(Integer id) {
         Usuario usuario = encontrar(id);
         protegerUltimoAdmin(usuario);
         usuario.setAtivo(false);
+        sessoes.revogarPorUsuario(id, Instant.now());
         salvar(usuario);
     }
 
