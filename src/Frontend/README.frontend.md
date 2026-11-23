@@ -23,13 +23,13 @@ Abra `http://localhost:4200`.
 | `/financeiro` | Caixa diário com OS a receber, movimentações, despesas e fechamento. |
 | `/usuarios` | Interface HTTP para o CRUD de usuários; o acesso à API exige autenticação Admin. |
 
-## Escopo desta entrega
+## Integração com o backend
 
-O Angular usa `HttpClient` e o proxy `src/proxy.conf.json` para enviar `/api/**` ao Spring Boot em `127.0.0.1:8080` durante `npm start`. Inicie o backend separadamente. O frontend não tem tela de login, interceptor de autenticação nem armazena credenciais. `HttpClient` não exige login, mas os endpoints de usuários e agendamentos exigem HTTP Basic no Spring Security; sem credenciais, a API responde `401`.
+O Angular usa `HttpClient` e o proxy `src/proxy.conf.json` para enviar `/api/**` ao Spring Boot em `127.0.0.1:8080` durante `npm start`. Inicie o backend separadamente. O login usa `/api/auth/login` e guarda o JWT de acesso apenas na memória. O refresh token fica no cookie HttpOnly emitido pelo backend. As rotas administrativas exigem login; `/usuarios` exige o papel Admin. Ao recarregar a página, o frontend tenta renovar a sessão por `/api/auth/refresh`. O menu da conta permite sair por `/api/auth/logout`.
 
 O CRUD de Usuários está preparado para consumir `/api/usuarios`. A seção **Agendamentos do servidor**, no topo da Agenda, está preparada para listar, criar, alterar status e excluir registros em `/api/agendamentos`. Ambas mostram a resposta de erro da API ao tentar consultar sem autenticação; não exibem dados locais como se fossem registros do servidor. A criação de agendamento pede IDs de veículo e serviço já existentes porque a API não devolve seus detalhes e ainda não há endpoint de veículos para preencher o formulário automaticamente. Os endpoints de clientes e serviços existem apenas no perfil `db` e não são usados nesta interface.
 
-O calendário abaixo dessa seção, o formulário público, o Dashboard, o Pátio/OS e o Financeiro ainda usam dados locais. Reservas do formulário público ficam no `localStorage` deste navegador e não são compartilhadas com o servidor nem com outros dispositivos. A agenda local começa vazia, sem agendamentos de exemplo. Esta entrega altera apenas o frontend.
+O calendário abaixo dessa seção, o formulário público, o Dashboard, o Pátio/OS e o Financeiro ainda usam dados locais. Reservas do formulário público ficam no `localStorage` deste navegador e não são compartilhadas com o servidor nem com outros dispositivos. A agenda local começa vazia, sem agendamentos de exemplo. A integração do login altera o frontend sobre o backend de autenticação já presente na branch.
 
 O dashboard calcula os indicadores operacionais a partir da agenda local. Os indicadores financeiros aparecem sem valor até que pagamentos e ordens de serviço sejam integrados ao frontend; agendamentos não são tratados como receita recebida.
 
@@ -37,7 +37,7 @@ O Pátio usa `PatioService` e guarda OS no `localStorage` deste navegador. Come�
 
 O Financeiro usa `FinanceService` e guarda lançamentos e fechamentos no `localStorage` deste navegador. Permite baixa manual integral de OS em `Pronto` ou `Entregue` por dinheiro, Pix ou cartão, sem guardar dados do cartão ou chave Pix. Impede baixa duplicada, registra despesas com categoria e forma de saída, calcula saldo e dinheiro esperado, e exige confirmação antes do fechamento. O fechamento bloqueia novos lançamentos locais na data. A escolha de perfil `FUNCIONARIO`/`ADMIN` é somente uma **prévia de interface, sem autenticação**: FUNCIONARIO consulta o dia e registra recebimentos; ADMIN também registra despesas, fecha o caixa e consulta fechamentos anteriores. Nenhuma dessas restrições é segurança real até a API validar o usuário autenticado, conforme a issue #29.
 
-A integração completa ainda precisa de APIs de veículos, de detalhes de clientes/serviços nos agendamentos, de OS, serviços/preços, funcionários, movimentações financeiras e fechamento. A autenticação HTTP Basic do backend protege usuários e agendamentos; ela ainda não substitui a prévia local de permissões do Financeiro.
+A integração completa ainda precisa de APIs de veículos, de detalhes de clientes/serviços nos agendamentos, de OS, serviços/preços, funcionários, movimentações financeiras e fechamento. O backend valida o JWT nos endpoints protegidos. A prévia local de permissões do Financeiro ainda não usa o papel autenticado.
 
 ```powershell
 npm run build
