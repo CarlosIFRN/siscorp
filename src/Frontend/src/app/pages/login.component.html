@@ -76,10 +76,12 @@
         <button class="auth-email-button" type="submit">Entrar <app-icon name="arrow" /></button>
       </form>
 
+      <button type="button" class="auth-demo-button" (click)="enterDemo()">Acessar demonstração sem login</button>
+
       <div class="auth-divider"><span>ou continue com</span></div>
 
       <div class="auth-provider-buttons">
-        <button type="button" class="auth-provider-button" (click)="showProviderNotice('Google')">
+        <button type="button" class="auth-provider-button" (click)="enterDemo()">
           <svg class="auth-provider-logo" viewBox="0 0 48 48" aria-hidden="true">
             <path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.9 6.1-15z"/>
             <path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.6-5.1c-1.8 1.2-4.1 1.9-6.9 1.9-5.3 0-9.8-3.6-11.4-8.4H5.8v5.2A20 20 0 0 0 24 44z"/>
@@ -88,7 +90,7 @@
           </svg>
           Continuar com Google
         </button>
-        <button type="button" class="auth-provider-button" (click)="showProviderNotice('Microsoft')">
+        <button type="button" class="auth-provider-button" (click)="enterDemo()">
           <svg class="auth-provider-logo" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#f25022" d="M1 1h10v10H1z"/>
             <path fill="#7fba00" d="M13 1h10v10H13z"/>
@@ -103,7 +105,7 @@
         <p class="auth-notice" role="status">{{ notice() }}</p>
       }
 
-      <p class="auth-demo-note"><app-icon name="info" /> Demonstração: a autenticação por senha e SSO ainda não está conectada.</p>
+      <p class="auth-demo-note"><app-icon name="info" /> Modo demonstração sem backend: use um e-mail válido e qualquer senha, ou entre direto. Google e Microsoft também abrem o painel sem validar identidade.</p>
     </div>
 
     <footer class="auth-main-footer">É cliente? <a routerLink="/agendar">Agende uma lavagem <app-icon name="arrow" /></a></footer>

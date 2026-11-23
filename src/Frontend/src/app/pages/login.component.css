@@ -43,6 +43,8 @@
 .auth-email-button:hover{background:#116e61}
 .auth-email-button:active{transform:translateY(1px)}
 .auth-email-button app-icon{width:16px;height:16px}
+.auth-demo-button{width:100%;margin-top:12px;padding:8px;background:transparent;color:#167e6d;font-size:11px;font-weight:700}
+.auth-demo-button:hover{text-decoration:underline}
 .auth-divider{display:flex;align-items:center;gap:13px;margin:24px 0;color:#91a19b;font-size:10px}
 .auth-divider::before,.auth-divider::after{height:1px;flex:1;background:#e4eae6;content:""}
 .auth-provider-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px}

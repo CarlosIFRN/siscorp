@@ -1,13 +1,23 @@
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
+  let router: Router;
 
-  beforeEach(() => {
-    component = new LoginComponent();
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LoginComponent],
+      providers: [provideRouter([])]
+    }).compileComponents();
+
+    component = TestBed.createComponent(LoginComponent).componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl').and.resolveTo(true);
   });
 
-  it('does not sign in with invalid email or missing password', () => {
+  it('does not open the dashboard with invalid email or missing password', () => {
     component.email.setValue('not-an-email');
     component.password.setValue('');
 
@@ -15,17 +25,22 @@ describe('LoginComponent', () => {
 
     expect(component.email.touched).toBeTrue();
     expect(component.password.touched).toBeTrue();
-    expect(component.notice()).toBe('');
+    expect(router.navigateByUrl).not.toHaveBeenCalled();
   });
 
-  it('explains that password sign-in is not connected', () => {
+  it('opens the dashboard with any valid email and non-empty password', () => {
     component.email.setValue('person@example.com');
     component.password.setValue('password123');
 
     component.signIn();
 
-    expect(component.notice()).toContain('login por e-mail e senha');
-    expect(component.notice()).toContain('Nenhum acesso foi realizado');
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('opens the dashboard directly in demo mode without credentials', () => {
+    component.enterDemo();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
   });
 
   it('explains that password recovery is not available yet', () => {
@@ -44,10 +59,4 @@ describe('LoginComponent', () => {
     expect(component.passwordVisible()).toBeTrue();
   });
 
-  it('explains that the selected SSO provider is not configured', () => {
-    component.showProviderNotice('Microsoft');
-
-    expect(component.notice()).toContain('Microsoft');
-    expect(component.notice()).toContain('SSO for configurado');
-  });
 });

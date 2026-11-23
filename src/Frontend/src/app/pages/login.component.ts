@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { IconComponent } from '../shared/icon.component';
 
 @Component({
@@ -10,6 +10,7 @@ import { IconComponent } from '../shared/icon.component';
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
+  private readonly router = inject(Router);
   readonly email = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] });
   readonly password = new FormControl('', { nonNullable: true, validators: [Validators.required] });
   readonly passwordVisible = signal(false);
@@ -21,7 +22,11 @@ export class LoginComponent {
     this.notice.set('');
     if (this.email.invalid || this.password.invalid) return;
 
-    this.notice.set('O login por e-mail e senha ainda não está conectado. Nenhum acesso foi realizado.');
+    this.enterDemo();
+  }
+
+  enterDemo(): void {
+    void this.router.navigateByUrl('/dashboard');
   }
 
   togglePasswordVisibility(): void {
@@ -37,7 +42,4 @@ export class LoginComponent {
     );
   }
 
-  showProviderNotice(provider: 'Google' | 'Microsoft'): void {
-    this.notice.set(`O acesso com ${provider} estará disponível quando o SSO for configurado.`);
-  }
 }
