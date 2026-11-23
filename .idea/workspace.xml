@@ -6,13 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="bbf80554-1e02-4e1c-b877-d795be299eaf" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/dto/CriarUsuarioRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/dto/CriarUsuarioRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/dto/UsuarioResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/dto/UsuarioResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/filter/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/filter/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/dto/AtualizarUsuarioRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/dto/AtualizarUsuarioRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/repository/UsuarioRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/java/com/example/demo/service/UsuarioService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/resources/application-db.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/resources/application-db.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Backend/demo/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/Backend/demo/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +96,7 @@
     </configuration>
     <configuration name="DemoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <envs>
-        <env name="JWT_SECRET" value="7nuVIy1cLUq2NIYb15U375hFSitXFeCtBStJS1yLaFE=" />
+        <env name="JWT_SECRET" value="yTWCAjJ8qDhAhlYYTUsUojhelREcZ4jrIYiR09QGZNc=" />
       </envs>
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="demo" />

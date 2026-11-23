@@ -1,12 +1,26 @@
+
 package com.example.demo.dto;
 
+import com.example.demo.model.TipoUsuario;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record AtualizarUsuarioRequest(
-        @NotBlank @Size(max = 100) String nome,
-        @NotBlank @Email @Size(max = 100) String email,
-        @Size(min = 8) String senha,
-        @Size(max = 20) String telefone
+        @NotBlank
+        @Size(max = 100)
+        String nome,
+
+        @NotBlank
+        @Email
+        @Size(max = 100)
+        String email,
+
+        @Size(min = 8)
+        String senha,
+
+        @Size(max = 20)
+        String telefone,
+
+        TipoUsuario tipoUsuario
 ) {}

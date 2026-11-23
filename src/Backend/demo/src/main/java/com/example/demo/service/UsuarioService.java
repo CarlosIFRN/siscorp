@@ -32,9 +32,16 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public List<UsuarioResponse> listar() {
-        return repository.findAll()
-                .stream()
+    public List<UsuarioResponse> listar(Boolean ativo) {
+        List<Usuario> usuarios;
+
+        if (ativo == null) {
+            usuarios = repository.findAll();
+        } else {
+            usuarios = repository.findByAtivo(ativo);
+        }
+
+        return usuarios.stream()
                 .map(UsuarioResponse::de)
                 .toList();
     }
@@ -70,18 +77,31 @@ public class UsuarioService {
         usuario.setNomeUsuario(request.nome().trim());
         usuario.setEmailUsuario(email);
         usuario.setTelefone(request.telefone());
+        if (request.tipoUsuario() != null) {
+            usuario.setTipoUsuario(request.tipoUsuario());
+        }
 
         if (request.senha() != null && !request.senha().isBlank()) {
             usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         }
 
         return UsuarioResponse.de(repository.save(usuario));
+
+
     }
 
     public void desativar(Integer id) {
         Usuario usuario = encontrar(id);
         usuario.setAtivo(false);
         repository.save(usuario);
+    }
+
+    public UsuarioResponse reativar(Integer id) {
+        Usuario usuario = encontrar(id);
+
+        usuario.setAtivo(true);
+
+        return UsuarioResponse.de(repository.save(usuario));
     }
 
     private Usuario encontrar(Integer id) {

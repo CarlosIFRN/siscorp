@@ -6,6 +6,9 @@ import com.example.demo.dto.CriarUsuarioRequest;
 import com.example.demo.dto.UsuarioResponse;
 import com.example.demo.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.net.URI;
 import java.util.List;
@@ -24,8 +27,9 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public List<UsuarioResponse> listar() {
-        return service.listar();
+    public List<UsuarioResponse> listar(
+            @RequestParam(required = false) Boolean ativo) {
+        return service.listar(ativo);
     }
 
     @GetMapping("/{id}")
@@ -56,5 +60,10 @@ public class UsuarioController {
     public ResponseEntity<Void> desativar(@PathVariable Integer id) {
         service.desativar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reativar")
+    public UsuarioResponse reativar(@PathVariable Integer id) {
+        return service.reativar(id);
     }
 }
