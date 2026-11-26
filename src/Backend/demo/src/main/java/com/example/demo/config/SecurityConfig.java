@@ -2,8 +2,9 @@ package com.example.demo.config;
 
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Locale;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,12 +35,15 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -82,13 +87,22 @@ public class SecurityConfig {
     @Bean
     public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter(
             UsuarioRepository usuarios) {
+        JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+        authorities.setAuthoritiesClaimName("roles");
+        authorities.setAuthorityPrefix("");
+        JwtAuthenticationConverter rolesConverter = new JwtAuthenticationConverter();
+        rolesConverter.setJwtGrantedAuthoritiesConverter(authorities);
         return jwt -> {
             Usuario usuario = usuarios.findByEmailUsuario(jwt.getSubject())
                     .filter(Usuario::isAtivo)
                     .orElseThrow(() -> new BadCredentialsException("Usuário inativo ou inexistente"));
-            String papel = "ROLE_" + usuario.getTipoUsuario().name().toUpperCase(Locale.ROOT);
-            return new JwtAuthenticationToken(jwt, List.of(new SimpleGrantedAuthority(papel)),
-                    usuario.getEmailUsuario());
+            AbstractAuthenticationToken autenticacao = rolesConverter.convert(jwt);
+            String papelAtual = "ROLE_" + usuario.getTipoUsuario().name().toUpperCase(Locale.ROOT);
+            if (autenticacao == null
+                    || !autenticacao.getAuthorities().contains(new SimpleGrantedAuthority(papelAtual))) {
+                throw new BadCredentialsException("Papel do token inválido");
+            }
+            return new JwtAuthenticationToken(jwt, autenticacao.getAuthorities(), usuario.getEmailUsuario());
         };
     }
 
@@ -106,6 +120,7 @@ public class SecurityConfig {
                                 && request.getRequestURI().startsWith("/api/auth/")))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh",
                                 "/api/auth/logout").permitAll()
@@ -118,9 +133,25 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/servicos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/servicos/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
+                .exceptionHandling(errors -> errors
+                        .authenticationEntryPoint((request, response, exception) ->
+                                responderErro(response, 401, "Não autenticado"))
+                        .accessDeniedHandler((request, response, exception) ->
+                                responderErro(response, 403, "Acesso negado")))
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable())
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(converter))
+                        .authenticationEntryPoint((request, response, exception) ->
+                                responderErro(response, 401, "Não autenticado"))
+                        .accessDeniedHandler((request, response, exception) ->
+                                responderErro(response, 403, "Acesso negado")));
         return http.build();
+    }
+
+    private void responderErro(HttpServletResponse response, int status, String mensagem) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"status\":" + status + ",\"erro\":\"" + mensagem + "\"}");
     }
 }
