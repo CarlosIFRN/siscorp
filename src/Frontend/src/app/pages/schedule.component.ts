@@ -2,12 +2,11 @@ import { Component, computed, HostListener, inject, OnInit, signal } from '@angu
 import { RouterLink } from '@angular/router';
 import { Appointment, AppointmentStatus, CrmService, SERVICES, STATUSES, dateKey, fromKey, serviceName, statusName } from '../core/crm.service';
 import { IconComponent } from '../shared/icon.component';
-import { ServerAppointmentsComponent } from './server-appointments.component';
 
 type CalendarView = 'day' | 'week' | 'month';
 interface CalendarDay { key: string; number: number; currentMonth: boolean; today: boolean; }
 
-@Component({ selector: 'app-schedule', standalone: true, imports: [RouterLink, IconComponent, ServerAppointmentsComponent], templateUrl: './schedule.component.html' })
+@Component({ selector: 'app-schedule', standalone: true, imports: [RouterLink, IconComponent], templateUrl: './schedule.component.html' })
 export class ScheduleComponent implements OnInit {
   readonly crm = inject(CrmService);
   readonly services = SERVICES;

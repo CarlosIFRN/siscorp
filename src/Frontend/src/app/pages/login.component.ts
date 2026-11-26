@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 import { IconComponent } from '../shared/icon.component';
@@ -17,9 +17,19 @@ export class LoginComponent {
   private readonly auth = inject(AuthService);
   readonly email = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] });
   readonly password = new FormControl('', { nonNullable: true, validators: [Validators.required] });
+  readonly form = new FormGroup({ email: this.email, password: this.password });
   readonly passwordVisible = signal(false);
   readonly loading = signal(false);
   readonly notice = signal('');
+
+  constructor() {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('email') || url.searchParams.has('password')) {
+      url.searchParams.delete('email');
+      url.searchParams.delete('password');
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+    }
+  }
 
   async signIn(): Promise<void> {
     this.email.markAsTouched();
