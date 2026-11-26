@@ -125,6 +125,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh",
                                 "/api/auth/logout").permitAll()
                         .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers("/api/empresas", "/api/empresas/**").hasRole("ADMIN")
                         .requestMatchers("/api/agendamentos", "/api/agendamentos/**")
                                 .hasAnyRole("ADMIN", "FUNCIONARIO")
                         .requestMatchers(HttpMethod.GET, "/api/servicos/ativos/**").permitAll()

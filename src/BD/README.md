@@ -9,6 +9,8 @@ Os scripts SQL estão organizados na seguinte ordem:
 - `01_criar_banco.sql` — criação do banco de dados `cwos`;
 - `02_criar_tabelas.sql` — criação das tabelas e seus relacionamentos.
 - `03_criar_usuarios.sql` — criação da tabela de usuários para o CRUD.
+- `04_criar_sessoes.sql` — criação da tabela de sessões de autenticação.
+- `05_vincular_usuarios_empresas.sql` — vínculo de usuários a empresas em bancos existentes.
 
 ## Ordem de execução
 
@@ -29,6 +31,8 @@ Com o banco `cwos` selecionado, executar o arquivo:
 ### 3. Criar a tabela de usuários
 
 Com o banco `cwos` selecionado, executar `03_criar_usuarios.sql`. O script também pode ser executado em um banco já criado com os dois primeiros scripts.
+
+Depois, execute `04_criar_sessoes.sql`. Em bancos anteriores a esta alteração, execute `05_vincular_usuarios_empresas.sql`. Com os perfis Spring `db,demo`, o JPA também atualiza o esquema e cria uma empresa fictícia. As quatro contas de demonstração são criadas se as variáveis de senha descritas em `README.auth.md` estiverem configuradas.
 
 ## Tabelas atuais
 
@@ -51,6 +55,7 @@ O modelo atual possui as seguintes tabelas:
 
 - Uma empresa pode possuir vários clientes.
 - Uma empresa pode possuir vários funcionários.
+- Uma empresa pode possuir vários usuários de login.
 - Um funcionário pertence a um cargo.
 - Um cliente pode possuir veículos.
 - Um veículo pode possuir agendamentos.

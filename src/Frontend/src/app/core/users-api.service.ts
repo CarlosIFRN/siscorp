@@ -9,6 +9,13 @@ export interface ApiUser {
   telefone: string;
   ativo: boolean;
   tipoUsuario: UserRole;
+  idEmpresa?: number | null;
+}
+
+export interface ApiCompany {
+  id: number;
+  nome: string;
+  cnpj: string;
 }
 
 export interface UserInput {
@@ -17,12 +24,14 @@ export interface UserInput {
   telefone: string;
   senha?: string;
   tipoUsuario: UserRole;
+  idEmpresa?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
 export class UsersApiService {
   private readonly http = inject(HttpClient);
   list(): Promise<ApiUser[]> { return firstValueFrom(this.http.get<ApiUser[]>('/api/usuarios')); }
+  listCompanies(): Promise<ApiCompany[]> { return firstValueFrom(this.http.get<ApiCompany[]>('/api/empresas')); }
   get(id: number): Promise<ApiUser> { return firstValueFrom(this.http.get<ApiUser>(`/api/usuarios/${id}`)); }
   create(input: UserInput): Promise<ApiUser> { return firstValueFrom(this.http.post<ApiUser>('/api/usuarios', input)); }
   update(id: number, input: UserInput): Promise<ApiUser> {

@@ -29,6 +29,10 @@ public class Usuario {
     @Column(name = "tipo_usuario", nullable = false, length = 30)
     private TipoUsuario tipoUsuario;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_empresa", foreignKey = @ForeignKey(name = "fk_usuario_empresa"))
+    private Empresa empresa;
+
     public Usuario() {}
 
     public Integer getIdUsuario() { return idUsuario; }
@@ -51,4 +55,6 @@ public class Usuario {
 
     public TipoUsuario getTipoUsuario() { return tipoUsuario; }
     public void setTipoUsuario(TipoUsuario tipoUsuario) { this.tipoUsuario = tipoUsuario; }
+    public Empresa getEmpresa() { return empresa; }
+    public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
 }

@@ -1,39 +1,21 @@
 # CRUD de usuários
 
-O backend requer Java 25 LTS.
+O backend usa Spring Data JPA e Spring Security. O perfil padrão `local` usa H2 em arquivo (`data/cwos.mv.db`). Para PostgreSQL, configure `DB_PASSWORD`, `CWOS_JWT_SECRET` e inicie com `--spring.profiles.active=db,demo`. `DB_URL` e `DB_USERNAME` são opcionais; os padrões são `jdbc:postgresql://localhost:5432/cwos` e `postgres`. O servidor PostgreSQL precisa estar em execução.
 
-O perfil padrão `local` usa um banco H2 em arquivo (`data/cwos.mv.db`). Os usuários permanecem salvos após reiniciar o backend. O `UsuarioRepository` usa Spring Data JPA em todos os perfis.
+O perfil `demo` cria pelo JPA a empresa fictícia Lava Jato CWOS Demo. Para criar as quatro contas em um banco novo, configure as variáveis de senha indicadas em `README.auth.md`; nenhuma senha fica no repositório. Mateus e Diogo são administradores; João e Laércio são funcionários. Telefones são dados fictícios. O perfil `local` também cria a empresa e o administrador inicial `admin@cwos.local`.
 
-No Windows, a partir de `src/Backend/demo`:
-
-```cmd
-mvnw.cmd spring-boot:run
-```
-
-Para usar PostgreSQL, execute os scripts em `src/BD` (inclusive `03_criar_usuarios.sql`) e defina `SPRING_PROFILES_ACTIVE=db` e `DB_PASSWORD` antes do comando. `DB_URL` e `DB_USERNAME` são opcionais; os padrões são `jdbc:postgresql://localhost:5432/cwos` e `postgres`.
-
-O Spring Security autentica com e-mail e senha dos usuários salvos pelo Spring Data JPA. O perfil local aceita conexões apenas deste computador e, na primeira inicialização, cria `admin@cwos.local` com senha `Admin123!` se ainda não houver um administrador ativo. Altere essa senha pelo CRUD antes de usar o ambiente com outras pessoas. No perfil `db`, informe `CWOS_ADMIN_EMAIL` e `CWOS_ADMIN_PASSWORD` para criar o primeiro administrador; essas variáveis não alteram a senha de uma conta já criada.
-
-A API usa HTTP Basic sem sessão. Envie as credenciais em cada requisição. `GET /api/auth/me` confirma a autenticação e devolve o usuário atual. Contas inativas não entram; apenas `Admin` acessa o CRUD de usuários.
-O último administrador ativo não pode ser desativado nem rebaixado para outro tipo de usuário.
-
-```cmd
-curl -u admin@cwos.local:Admin123! http://127.0.0.1:8080/api/auth/me
-```
-
-## Rotas
+Faça login em `POST /api/auth/login` e use o JWT no cabeçalho `Authorization: Bearer <token>`. Consulte `README.auth.md` para o fluxo de CSRF, renovação e logout. O último administrador ativo não pode ser desativado nem rebaixado.
 
 | Método | Rota | Ação |
 | --- | --- | --- |
-| GET | `/api/usuarios` | Listar, incluindo desativados |
-| GET | `/api/usuarios/{id}` | Buscar |
-| POST | `/api/usuarios` | Criar |
-| PUT | `/api/usuarios/{id}` | Atualizar |
-| DELETE | `/api/usuarios/{id}` | Desativar sem apagar o registro |
+| GET | `/api/empresas` | Listar empresas para o cadastro |
+| GET | `/api/usuarios` | Listar usuários, incluindo desativados |
+| GET | `/api/usuarios/{id}` | Buscar usuário |
+| POST | `/api/usuarios` | Criar usuário |
+| PUT | `/api/usuarios/{id}` | Atualizar usuário |
+| DELETE | `/api/usuarios/{id}` | Desativar usuário |
 
-Todas as rotas do CRUD exigem autenticação HTTP Basic com o papel `ADMIN`. No perfil local, use `admin@cwos.local` / `Admin123!` após a primeira inicialização.
-
-Exemplo de cadastro:
+Essas rotas exigem o papel `Admin`. Para criar uma conta, selecione uma empresa existente:
 
 ```json
 {
@@ -41,10 +23,9 @@ Exemplo de cadastro:
   "email": "ana@example.com",
   "senha": "senhaForte123",
   "telefone": "84999990000",
-  "tipoUsuario": "Funcionario"
+  "tipoUsuario": "Funcionario",
+  "idEmpresa": 1
 }
 ```
 
-`tipoUsuario` pode ser `Cliente`, `Funcionario` ou `Admin`; se omitido na criação, assume `Funcionario`. Na atualização, omitir `senha` e `tipoUsuario` mantém os valores atuais. A API devolve `id`, `nome`, `email`, `telefone`, `ativo` e `tipoUsuario`, sem devolver a senha. O e-mail é normalizado para minúsculas e deve ser único. Um e-mail duplicado retorna HTTP 409; um ID inexistente retorna HTTP 404.
-
-O frontend ainda não envia credenciais para a API. O botão “Sair” permanece desativado até a integração do login na interface; com HTTP Basic, sair significa descartar as credenciais no cliente.
+`tipoUsuario` pode ser `Cliente`, `Funcionario` ou `Admin`; se omitido na criação, assume `Funcionario`. Na atualização, omitir `senha`, `tipoUsuario` ou `idEmpresa` mantém o valor anterior. A resposta não inclui a senha. E-mail duplicado retorna 409; usuário ou empresa inexistente retorna 404.

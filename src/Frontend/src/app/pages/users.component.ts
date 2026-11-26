@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { apiError } from '../core/api-error';
-import { ApiUser, UserInput, UsersApiService } from '../core/users-api.service';
+import { ApiCompany, ApiUser, UserInput, UsersApiService } from '../core/users-api.service';
 
 @Component({ selector: 'app-users', standalone: true, imports: [FormsModule], templateUrl: './users.component.html' })
 export class UsersComponent {
   private readonly api = inject(UsersApiService);
   readonly users = signal<ApiUser[]>([]);
+  readonly companies = signal<ApiCompany[]>([]);
   readonly loading = signal(false);
   readonly loaded = signal(false);
   readonly available = signal(false);
@@ -19,7 +20,10 @@ export class UsersComponent {
 
   async load(): Promise<void> {
     this.loading.set(true); this.loaded.set(true); this.error.set('');
-    try { this.users.set(await this.api.list()); this.available.set(true); }
+    try {
+      const [users, companies] = await Promise.all([this.api.list(), this.api.listCompanies()]);
+      this.users.set(users); this.companies.set(companies); this.available.set(true);
+    }
     catch (error) { this.users.set([]); this.available.set(false); this.error.set(apiError(error, 'Não foi possível carregar os usuários.')); }
     finally { this.loading.set(false); }
   }
@@ -30,7 +34,7 @@ export class UsersComponent {
     try {
       const user = await this.api.get(id);
       this.form = { nome: user.nome, email: user.email, telefone: user.telefone,
-        senha: '', tipoUsuario: user.tipoUsuario };
+        senha: '', tipoUsuario: user.tipoUsuario, idEmpresa: user.idEmpresa ?? null };
       this.editingId.set(id);
       document.getElementById('user-form-title')?.scrollIntoView({ behavior: 'smooth' });
     } catch (error) { this.error.set(apiError(error, 'Não foi possível consultar o usuário.')); }
@@ -39,10 +43,14 @@ export class UsersComponent {
   async save(): Promise<void> {
     this.error.set(''); this.notice.set('');
     const input: UserInput = { nome: this.form.nome.trim(), email: this.form.email.trim(),
-      telefone: this.form.telefone.trim(), tipoUsuario: this.form.tipoUsuario };
+      telefone: this.form.telefone.trim(), tipoUsuario: this.form.tipoUsuario,
+      idEmpresa: this.form.idEmpresa };
     if (this.form.senha) input.senha = this.form.senha;
     if (!input.nome || !input.email || !input.telefone || (this.editingId() === null && !input.senha)) {
       this.error.set('Preencha nome, e-mail, telefone e senha para novos usuários.'); return;
+    }
+    if (this.editingId() === null && !input.idEmpresa) {
+      this.error.set('Selecione a empresa do usuário.'); return;
     }
     this.saving.set(true);
     try {
@@ -70,6 +78,10 @@ export class UsersComponent {
   }
 
   private emptyForm(): UserInput {
-    return { nome: '', email: '', telefone: '', senha: '', tipoUsuario: 'Funcionario' };
+    return { nome: '', email: '', telefone: '', senha: '', tipoUsuario: 'Funcionario', idEmpresa: null };
+  }
+
+  companyName(id: number | null | undefined): string {
+    return this.companies().find(company => company.id === id)?.nome ?? 'Sem empresa';
   }
 }

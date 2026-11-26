@@ -9,6 +9,7 @@ export interface AuthUser {
   telefone: string;
   ativo: boolean;
   tipoUsuario: 'Admin' | 'Funcionario' | 'Cliente';
+  idEmpresa?: number | null;
 }
 
 interface AuthResponse {
@@ -25,6 +26,7 @@ export class AuthService {
   readonly user = this.userState.asReadonly();
   private accessToken: string | null = null;
   private refreshPending: Promise<boolean> | null = null;
+  private revision = 0;
 
   get token(): string | null {
     return this.accessToken;
@@ -56,14 +58,16 @@ export class AuthService {
   }
 
   private async refresh(): Promise<boolean> {
+    const revision = this.revision;
     try {
       await this.csrf();
       const response = await firstValueFrom(this.http.post<AuthResponse>('/api/auth/refresh', {}));
+      if (revision !== this.revision) return this.accessToken !== null;
       this.save(response);
       return true;
     } catch {
-      this.clear();
-      return false;
+      if (revision === this.revision) this.clear();
+      return this.accessToken !== null;
     }
   }
 
@@ -72,11 +76,13 @@ export class AuthService {
   }
 
   private save(response: AuthResponse): void {
+    this.revision++;
     this.accessToken = response.accessToken;
     this.userState.set(response.usuario);
   }
 
   private clear(): void {
+    this.revision++;
     this.accessToken = null;
     this.userState.set(null);
   }
