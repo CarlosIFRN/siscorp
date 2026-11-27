@@ -1,0 +1,89 @@
+package com.example.demo.model;
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "ordens_servico")
+public class OrdemServico {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private Long agendamentoId;
+
+    @Column(nullable = false)
+    private Long veiculoId;
+
+    @Column(nullable = false)
+    private LocalDateTime dataEntrada;
+
+    private LocalDateTime dataCheckin;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusPatio statusPatio = StatusPatio.AGUARDANDO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PrioridadeAtendimento prioridade = PrioridadeAtendimento.NORMAL;
+
+    private boolean atrasado;
+    private long minutosAtraso;
+
+    @Column(length = 1000)
+    private String checklistAvarias;
+
+    private boolean concluida = false;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal valorTotal = BigDecimal.ZERO;
+
+    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemOrdemServico> itens = new ArrayList<>();
+
+    public void adicionarItem(ItemOrdemServico item) {
+        item.setOrdemServico(this);
+        this.itens.add(item);
+        recalcularTotal();
+    }
+
+    public void removerItem(Long itemId) {
+        this.itens.removeIf(i -> i.getId() != null && i.getId().equals(itemId));
+        recalcularTotal();
+    }
+
+    public void recalcularTotal() {
+        this.valorTotal = itens.stream()
+                .map(ItemOrdemServico::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // Getters e setters omitidos por brevidade
+    public Long getId() { return id; }
+    public LocalDateTime getDataEntrada() { return dataEntrada; }
+    public void setDataEntrada(LocalDateTime dataEntrada) { this.dataEntrada = dataEntrada; }
+    public LocalDateTime getDataCheckin() { return dataCheckin; }
+    public void setDataCheckin(LocalDateTime dataCheckin) { this.dataCheckin = dataCheckin; }
+    public StatusPatio getStatusPatio() { return statusPatio; }
+    public void setStatusPatio(StatusPatio statusPatio) { this.statusPatio = statusPatio; }
+    public PrioridadeAtendimento getPrioridade() { return prioridade; }
+    public void setPrioridade(PrioridadeAtendimento prioridade) { this.prioridade = prioridade; }
+    public boolean isAtrasado() { return atrasado; }
+    public void setAtrasado(boolean atrasado) { this.atrasado = atrasado; }
+    public long getMinutosAtraso() { return minutosAtraso; }
+    public void setMinutosAtraso(long minutosAtraso) { this.minutosAtraso = minutosAtraso; }
+    public String getChecklistAvarias() { return checklistAvarias; }
+    public void setChecklistAvarias(String checklistAvarias) { this.checklistAvarias = checklistAvarias; }
+    public boolean isConcluida() { return concluida; }
+    public void setConcluida(boolean concluida) { this.concluida = concluida; }
+    public BigDecimal getValorTotal() { return valorTotal; }
+    public List<ItemOrdemServico> getItens() { return itens; }
+    public void setAgendamentoId(Long agendamentoId) { this.agendamentoId = agendamentoId; }
+    public void setVeiculoId(Long veiculoId) { this.veiculoId = veiculoId; }
+}
