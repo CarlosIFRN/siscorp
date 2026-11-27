@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -42,6 +44,7 @@ public class TokenService {
                 .issuedAt(agora)
                 .expiresAt(agora.plus(duracaoAcesso))
                 .claim("token_type", "access")
+                .claim("roles", List.of("ROLE_" + usuario.getTipoUsuario().name().toUpperCase(Locale.ROOT)))
                 .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();

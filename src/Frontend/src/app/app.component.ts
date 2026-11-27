@@ -3,15 +3,18 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { IconComponent } from './shared/icon.component';
+import { AuthService } from './core/auth.service';
 
 @Component({ selector: 'app-root', standalone: true, imports: [RouterOutlet, RouterLink, RouterLinkActive, IconComponent], templateUrl: './app.component.html' })
 export class AppComponent {
   readonly router = inject(Router);
+  readonly auth = inject(AuthService);
   readonly layout = signal<'admin' | 'public'>('admin');
   readonly collapsed = signal(this.restoreSidebar());
   readonly mobileOpen = signal(false);
   readonly accountMenuOpen = signal(false);
   readonly accountPanel = signal<'menu' | 'profile' | 'settings'>('menu');
+  readonly logoutError = signal('');
   constructor() {
     this.router.events.pipe(filter(event => event instanceof NavigationEnd), takeUntilDestroyed()).subscribe(() => {
       const data = this.router.routerState.root.firstChild?.snapshot.data;
@@ -26,7 +29,16 @@ export class AppComponent {
     if (window.innerWidth <= 760) { this.mobileOpen.update(value => !value); return; }
     this.accountMenuOpen.set(false);
     this.collapsed.update(value => !value);
-    try { localStorage.setItem('cwos.sidebar.collapsed', this.collapsed() ? '1' : '0'); } catch { /* preferência opcional */ }
+    try { localStorage.setItem('cwos.sidebar.collapsed', this.collapsed() ? '1' : '0'); } catch {}
+  }
+  async logout(): Promise<void> {
+    this.logoutError.set('');
+    try {
+      await this.auth.logout();
+      await this.router.navigateByUrl('/login');
+    } catch {
+      this.logoutError.set('Não foi possível encerrar a sessão. Tente novamente.');
+    }
   }
   toggleAccountMenu(): void { this.accountMenuOpen.update(value => !value); this.accountPanel.set('menu'); }
   @HostListener('document:click', ['$event']) onDocumentClick(event: MouseEvent): void {

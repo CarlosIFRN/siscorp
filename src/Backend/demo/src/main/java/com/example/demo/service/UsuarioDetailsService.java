@@ -21,7 +21,7 @@ public class UsuarioDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String normalizado = email.trim().toLowerCase(Locale.ROOT);
         Usuario usuario = repository.findByEmailUsuario(normalizado)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("Credenciais inválidas"));
         return User.withUsername(usuario.getEmailUsuario())
                 .password(usuario.getSenhaHash())
                 .disabled(!usuario.isAtivo())

@@ -1,23 +1,17 @@
 <section class="api-page" aria-labelledby="users-title">
-  <header class="api-page-heading"><div><span class="admin-kicker">ADMINISTRAÇÃO · DADOS DO SERVIDOR</span><h1 id="users-title" tabindex="-1">Usuários</h1><p>Cadastro conectado à API do Spring Boot.</p></div></header>
-  <p class="api-local-caption">A API de usuários exige autenticação de administrador. Esta interface não envia credenciais.</p>
-  <button type="button" class="admin-primary" (click)="load()" [disabled]="loading()">Consultar API</button>
-  @if (loaded()) {
-    @if (error()) { <div class="admin-alert" role="alert">{{ error() }} <button type="button" (click)="load()">Tentar novamente</button></div> }
-    @if (notice()) { <p class="api-notice" role="status">{{ notice() }}</p> }
-  }
-  @if (available()) {
+  <header class="api-page-heading"><h1 id="users-title" tabindex="-1">Usuários</h1></header>
+  @if (error()) { <div class="admin-alert" role="alert">{{ error() }} <button type="button" (click)="load()">Tentar novamente</button></div> }
+  @if (notice()) { <p class="api-notice" role="status">{{ notice() }}</p> }
     <div class="api-users-grid">
-      <section class="api-panel" aria-labelledby="users-list-title"><div class="api-panel-heading"><h2 id="users-list-title">Contas cadastradas</h2><button type="button" (click)="load()" [disabled]="loading()">Atualizar</button></div>
+      <section class="api-panel" aria-labelledby="users-list-title"><div class="api-panel-heading"><h2 id="users-list-title">Contas cadastradas</h2></div>
         @if (loading()) { <p class="api-empty">Carregando usuários…</p> }
-        @else if (!users().length) { <p class="api-empty">Nenhum usuário encontrado.</p> }
-        @else { <div class="api-table-wrap"><table class="api-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Estado</th><th>Ações</th></tr></thead><tbody>
-          @for (user of users(); track user.id) { <tr><td><strong>{{ user.nome }}</strong><small>{{ user.telefone }}</small></td><td>{{ user.email }}</td><td>{{ user.tipoUsuario }}</td><td>{{ user.ativo ? 'Ativo' : 'Inativo' }}</td><td><div class="api-row-actions"><button type="button" (click)="startEdit(user.id)" [disabled]="saving()">Editar</button>@if (user.ativo) { <button type="button" (click)="deactivate(user.id)" [disabled]="saving()">{{ confirmingId() === user.id ? 'Confirmar desativação' : 'Desativar' }}</button>@if (confirmingId() === user.id) { <button type="button" (click)="confirmingId.set(null)">Cancelar</button> } }</div></td></tr> }
+        @else if (!error() && !users().length) { <p class="api-empty">Nenhum usuário encontrado.</p> }
+        @else if (users().length) { <div class="api-table-wrap"><table class="api-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Empresa</th><th>Perfil</th><th>Estado</th><th>Ações</th></tr></thead><tbody>
+          @for (user of users(); track user.id) { <tr><td><strong>{{ user.nome }}</strong><small>{{ user.telefone }}</small></td><td>{{ user.email }}</td><td>{{ companyName(user.idEmpresa) }}</td><td>{{ user.tipoUsuario }}</td><td>{{ user.ativo ? 'Ativo' : 'Inativo' }}</td><td><div class="api-row-actions"><button type="button" (click)="startEdit(user.id)" [disabled]="saving()">Editar</button>@if (user.ativo) { <button type="button" (click)="deactivate(user.id)" [disabled]="saving()">{{ confirmingId() === user.id ? 'Confirmar desativação' : 'Desativar' }}</button>@if (confirmingId() === user.id) { <button type="button" (click)="confirmingId.set(null)">Cancelar</button> } }</div></td></tr> }
         </tbody></table></div> }
       </section>
       <section class="api-panel api-user-form" aria-labelledby="user-form-title"><div class="api-panel-heading"><h2 id="user-form-title">{{ editingId() === null ? 'Novo usuário' : 'Editar usuário' }}</h2>@if (editingId() !== null) { <button type="button" (click)="startCreate()">Cancelar edição</button> }</div>
-        <form (ngSubmit)="save()"><label>Nome<input name="nome" [(ngModel)]="form.nome" required maxlength="100"></label><label>E-mail<input name="email" type="email" [(ngModel)]="form.email" required maxlength="100"></label><label>Telefone<input name="telefone" [(ngModel)]="form.telefone" required maxlength="20"></label><label>{{ editingId() === null ? 'Senha' : 'Nova senha (opcional)' }}<input name="senha" type="password" [(ngModel)]="form.senha" [required]="editingId() === null" minlength="8" autocomplete="new-password"></label><label>Perfil<select name="tipoUsuario" [(ngModel)]="form.tipoUsuario"><option value="Funcionario">Funcionário</option><option value="Admin">Admin</option><option value="Cliente">Cliente</option></select></label><button type="submit" class="admin-primary" [disabled]="saving()">{{ saving() ? 'Salvando…' : editingId() === null ? 'Criar usuário' : 'Salvar alterações' }}</button></form>
+        <form (ngSubmit)="save()"><label>Nome<input name="nome" [(ngModel)]="form.nome" required maxlength="100"></label><label>E-mail<input name="email" type="email" [(ngModel)]="form.email" required maxlength="100"></label><label>Empresa<select name="idEmpresa" [(ngModel)]="form.idEmpresa" [required]="editingId() === null"><option [ngValue]="null">Selecione uma empresa</option>@for (company of companies(); track company.id) { <option [ngValue]="company.id">{{ company.nome }}</option> }</select></label><label>Telefone<input name="telefone" [(ngModel)]="form.telefone" required maxlength="20"></label><label>{{ editingId() === null ? 'Senha' : 'Nova senha (opcional)' }}<input name="senha" type="password" [(ngModel)]="form.senha" [required]="editingId() === null" minlength="8" autocomplete="new-password"></label><label>Perfil<select name="tipoUsuario" [(ngModel)]="form.tipoUsuario"><option value="Funcionario">Funcionário</option><option value="Admin">Admin</option><option value="Cliente">Cliente</option></select></label><button type="submit" class="admin-primary" [disabled]="saving()">{{ saving() ? 'Salvando…' : editingId() === null ? 'Criar usuário' : 'Salvar alterações' }}</button></form>
       </section>
     </div>
-  }
 </section>

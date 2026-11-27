@@ -4,6 +4,7 @@ import com.example.demo.dto.UsuarioRequestDTO;
 import com.example.demo.dto.UsuarioResponseDTO;
 import com.example.demo.model.Usuario;
 import com.example.demo.model.TipoUsuario;
+import com.example.demo.repository.EmpresaRepository;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.repository.SessaoRepository;
 import java.time.Instant;
@@ -11,22 +12,26 @@ import java.util.List;
 import java.util.Locale;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@PreAuthorize("hasRole('ADMIN')")
 public class UsuarioService {
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final SessaoRepository sessoes;
+    private final EmpresaRepository empresas;
 
     public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder,
-            SessaoRepository sessoes) {
+            SessaoRepository sessoes, EmpresaRepository empresas) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.sessoes = sessoes;
+        this.empresas = empresas;
     }
 
     public List<UsuarioResponseDTO> listar() {
@@ -46,6 +51,8 @@ public class UsuarioService {
         usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         usuario.setTelefone(request.telefone().trim());
         usuario.setTipoUsuario(request.tipoUsuario() == null ? TipoUsuario.Funcionario : request.tipoUsuario());
+        usuario.setEmpresa(empresas.findById(request.idEmpresa())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empresa não encontrada")));
         return UsuarioResponseDTO.de(salvar(usuario));
     }
 
@@ -62,6 +69,10 @@ public class UsuarioService {
         usuario.setTelefone(request.telefone().trim());
         if (request.tipoUsuario() != null) {
             usuario.setTipoUsuario(request.tipoUsuario());
+        }
+        if (request.idEmpresa() != null) {
+            usuario.setEmpresa(empresas.findById(request.idEmpresa())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empresa não encontrada")));
         }
         if (request.senha() != null) {
             usuario.setSenhaHash(passwordEncoder.encode(request.senha()));

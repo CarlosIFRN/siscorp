@@ -13,7 +13,8 @@ public record UsuarioResponseDTO(
         @NotBlank @Email @Size(max = 100) String email,
         @Size(max = 20) String telefone,
         boolean ativo,
-        TipoUsuario tipoUsuario
+        TipoUsuario tipoUsuario,
+        Integer idEmpresa
 ) {
     public static UsuarioResponseDTO de(Usuario usuario) {
         return new UsuarioResponseDTO(
@@ -22,7 +23,8 @@ public record UsuarioResponseDTO(
                 usuario.getEmailUsuario(),
                 usuario.getTelefone(),
                 usuario.isAtivo(),
-                usuario.getTipoUsuario()
+                usuario.getTipoUsuario(),
+                usuario.getEmpresa() == null ? null : usuario.getEmpresa().getIdEmpresa()
         );
     }
 }
