@@ -32,6 +32,8 @@ export class PatioComponent implements OnInit {
   readonly formError = signal('');
   readonly detailError = signal('');
   readonly notice = signal('');
+  readonly draggedId = signal<number | null>(null);
+  readonly dropTarget = signal<OsStage | null>(null);
   readonly selectedOrder = computed(() => this.patio.orders().find(order => order.id === this.selectedId()) ?? null);
   readonly availableAppointments = computed(() => {
     const used = new Set(this.patio.orders().filter(order => order.appointmentId !== null).map(order => order.appointmentId));
@@ -60,6 +62,40 @@ export class PatioComponent implements OnInit {
     return this.filteredOrders().filter(order => order.stage === stage)
       .sort((a, b) => a.enteredAt.localeCompare(b.enteredAt));
   }
+
+  startDrag(event: DragEvent, order: ServiceOrder): void {
+    if (!nextStage(order.stage)) { event.preventDefault(); return; }
+    this.draggedId.set(order.id);
+    event.dataTransfer?.setData('text/plain', String(order.id));
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  }
+
+  onDragOver(event: DragEvent, stage: OsStage): void {
+    const order = this.patio.orders().find(item => item.id === this.draggedId());
+    if (!order || nextStage(order.stage) !== stage) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    this.dropTarget.set(stage);
+  }
+
+  onDragLeave(event: DragEvent, stage: OsStage): void {
+    const target = event.currentTarget;
+    if (target instanceof Element && event.relatedTarget instanceof Node && target.contains(event.relatedTarget)) return;
+    if (this.dropTarget() === stage) this.dropTarget.set(null);
+  }
+
+  drop(event: DragEvent, stage: OsStage): void {
+    event.preventDefault();
+    const order = this.patio.orders().find(item => item.id === this.draggedId());
+    this.endDrag();
+    if (!order || nextStage(order.stage) !== stage) return;
+    try {
+      this.patio.advance(order.id, order.responsible);
+      this.notice.set(`OS #${order.id} movida para ${stageName(stage)}.`);
+    } catch (error) { this.notice.set(this.message(error)); }
+  }
+
+  endDrag(): void { this.draggedId.set(null); this.dropTarget.set(null); }
 
   openForm(mode: Exclude<FormMode, null>): void {
     this.selectedId.set(null);

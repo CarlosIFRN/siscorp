@@ -5,17 +5,19 @@
   </header>
 
   <div class="os-summary" aria-label="Resumo do pátio"><span><strong>{{ openCount() }}</strong> OS aberta{{ openCount() === 1 ? '' : 's' }}</span><span><strong>{{ readyCount() }}</strong> pronta{{ readyCount() === 1 ? '' : 's' }} para entrega</span><span><strong>{{ availableAppointments().length }}</strong> agendamento{{ availableAppointments().length === 1 ? '' : 's' }} para check-in</span></div>
+  <p class="os-drag-help">Arraste uma OS para a próxima coluna para avançar a etapa.</p>
+  @if (notice() && selectedId() === null) { <div class="os-alert" role="status">{{ notice() }}</div> }
   @if (patio.error()) { <div class="os-alert" role="alert">{{ patio.error() }} <button type="button" (click)="patio.refresh()">Tentar novamente</button></div> }
   <div class="os-search"><label><app-icon name="search" /><span class="sr-only">Buscar por placa, veículo, cliente ou funcionário</span><input type="search" placeholder="Buscar placa, veículo, cliente ou funcionário" [value]="search()" (input)="search.set($any($event.target).value)"></label><span>{{ filteredOrders().length }} OS exibida{{ filteredOrders().length === 1 ? '' : 's' }}</span></div>
 
   @if (patio.orders().length === 0 && !patio.error()) { <div class="os-board-empty"><app-icon name="car" /><strong>O pátio está vazio</strong><p>Faça o check-in de um agendamento ou abra uma OS para um veículo que chegou sem reserva.</p></div> }
   <div class="os-board" aria-label="Quadro de ordens de serviço">
     @for (stage of stages; track stage.id) {
-      <section class="os-column" [class]="'os-column os-stage-' + stage.id.toLowerCase()" [attr.aria-label]="stage.name + ', ' + ordersBy(stage.id).length + ' ordens de serviço'">
+      <section class="os-column" [class]="'os-column os-stage-' + stage.id.toLowerCase()" [class.is-drop-target]="dropTarget() === stage.id" [attr.aria-label]="stage.name + ', ' + ordersBy(stage.id).length + ' ordens de serviço'" (dragover)="onDragOver($event, stage.id)" (dragleave)="onDragLeave($event, stage.id)" (drop)="drop($event, stage.id)">
         <div class="os-column-heading"><h2>{{ stage.name }}</h2><span>{{ ordersBy(stage.id).length }}</span></div>
         <div class="os-column-body">
           @for (order of ordersBy(stage.id); track order.id) {
-            <button type="button" class="os-card" [id]="'os-card-' + order.id" [attr.aria-label]="'Abrir OS ' + order.id + ', placa ' + order.plate + ', ' + order.customer + ', ' + stage.name" (click)="openDetails(order.id)">
+            <button type="button" class="os-card" [id]="'os-card-' + order.id" [class.is-dragging]="draggedId() === order.id" [draggable]="!!nextStage(order.stage)" [attr.aria-label]="'Abrir OS ' + order.id + ', placa ' + order.plate + ', ' + order.customer + ', ' + stage.name" (dragstart)="startDrag($event, order)" (dragend)="endDrag()" (click)="openDetails(order.id)">
               <span class="os-card-top"><strong>{{ order.plate }}</strong><small>#{{ order.id }}</small></span>
               <span class="os-card-vehicle">{{ order.vehicle }}</span>
               <span class="os-card-row"><app-icon name="user" /> {{ order.customer }}</span>
