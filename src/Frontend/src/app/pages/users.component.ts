@@ -1,16 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { apiError } from '../core/api-error';
 import { ApiCompany, ApiUser, UserInput, UsersApiService } from '../core/users-api.service';
 
 @Component({ selector: 'app-users', standalone: true, imports: [FormsModule], templateUrl: './users.component.html' })
-export class UsersComponent {
+export class UsersComponent implements OnInit {
   private readonly api = inject(UsersApiService);
   readonly users = signal<ApiUser[]>([]);
   readonly companies = signal<ApiCompany[]>([]);
   readonly loading = signal(false);
-  readonly loaded = signal(false);
-  readonly available = signal(false);
   readonly saving = signal(false);
   readonly error = signal('');
   readonly notice = signal('');
@@ -18,13 +16,15 @@ export class UsersComponent {
   readonly confirmingId = signal<number | null>(null);
   form: UserInput = this.emptyForm();
 
+  ngOnInit(): void { void this.load(); }
+
   async load(): Promise<void> {
-    this.loading.set(true); this.loaded.set(true); this.error.set('');
+    this.loading.set(true); this.error.set('');
     try {
       const [users, companies] = await Promise.all([this.api.list(), this.api.listCompanies()]);
-      this.users.set(users); this.companies.set(companies); this.available.set(true);
+      this.users.set(users); this.companies.set(companies);
     }
-    catch (error) { this.users.set([]); this.available.set(false); this.error.set(apiError(error, 'Não foi possível carregar os usuários.')); }
+    catch (error) { this.users.set([]); this.error.set(apiError(error, 'Não foi possível carregar os usuários.')); }
     finally { this.loading.set(false); }
   }
 
